@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useMutation } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Save, 
-  ArrowLeft, 
-  User, 
-  ClipboardList, 
-  Glasses, 
-  Activity, 
-  TestTube2, 
-  History, 
-  Settings, 
+import {
+  Save,
+  ArrowLeft,
+  User,
+  ClipboardList,
+  Glasses,
+  Activity,
+  TestTube2,
+  History,
+  Settings,
   Truck,
   CheckCircle,
   Loader2
@@ -46,12 +46,38 @@ export default function NouvelleFiche() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('identification');
   const [showSuccess, setShowSuccess] = useState(false);
-  
+  const [penicheData, setpenicheData] = useState(null);
+
   const [formData, setFormData] = useState({
     date_visite: format(new Date(), 'yyyy-MM-dd'),
     statut: 'en_cours',
     suivi_post_livraison: []
   });
+
+  useEffect(() => {
+    if (!window.ZOHO) {
+      console.error("ZOHO SDK non chargé");
+      return;
+    }
+
+    const onPageLoad = (data) => {
+      console.log("CURRENT PENICHE 1 :", data);
+      setpenicheData(data);
+    };
+
+    window.ZOHO.embeddedApp.on("PageLoad", onPageLoad);
+    window.ZOHO.embeddedApp.init();
+
+    return () => {
+      // Zoho ne fournit pas toujours off(), mais on protège quand même
+      try {
+        window.ZOHO.embeddedApp.off?.("PageLoad", onPageLoad);
+      } catch (e) {
+        // silencieux
+      }
+    };
+  }, []);
+
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.FicheAnamnese.create(data),
@@ -63,13 +89,40 @@ export default function NouvelleFiche() {
     }
   });
 
+  const createZohoAnamnese = async () => {
+    const current_deal_id = penicheData?.EntityId;
+    console.log("ID PENICHE : " , current_deal_id);
+
+    let json_data = {
+      "data": [
+        {
+          "Name": "Anamnese - " + formData.prenom + " " + formData.nom,
+          "Email": formData.email,
+        }
+      ]
+    };
+    
+    return ZOHO.CRM.CONNECTION.invoke("zcrm", {
+      url: "https://www.zohoapis.eu/crm/v8/Anamneses",
+      method: "POST",
+      parameters: json_data
+    })
+      .then(function (response) {
+        console.log("Anamnese created successfully:", response);
+      })
+      .catch((error) => {
+        console.error("Error creating anamnese:", error);
+      });
+  };
+
   const handleSave = () => {
-    createMutation.mutate(formData);
+    console.log("peniche data au save :", penicheData);
+    createZohoAnamnese();
   };
 
   const renderSection = () => {
     const props = { data: formData, onChange: setFormData };
-    
+
     switch (activeTab) {
       case 'identification':
         return <IdentificationSection {...props} />;
@@ -129,7 +182,7 @@ export default function NouvelleFiche() {
             </div>
             <Button
               onClick={handleSave}
-              disabled={createMutation.isPending || !formData.nom || !formData.prenom}
+              disabled={createMutation.isPending || !formData.nom || !formData.email}
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-3 flex items-center gap-2 shadow-lg shadow-blue-600/30"
             >
               {createMutation.isPending ? (
@@ -144,10 +197,10 @@ export default function NouvelleFiche() {
       </div>
 
       {/* Navigation Tabs */}
-      <NavigationTabs 
-        tabs={tabs} 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
+      <NavigationTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
 
       {/* Content */}
