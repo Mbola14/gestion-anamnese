@@ -93,10 +93,11 @@ export default function NouvelleFiche() {
     const current_deal_id = penicheData?.EntityId;
     console.log("ID PENICHE : " , current_deal_id);
 
+    const fullName = [formData.prenom, formData.nom].filter(Boolean).join(' ');
     let json_data = {
       "data": [
         {
-          "Name": "Anamnese - " + formData.prenom + " " + formData.nom,
+          "Name": fullName ? `Anamnese - ${fullName}` : 'Anamnese',
           "Email": formData.email,
         }
       ]
