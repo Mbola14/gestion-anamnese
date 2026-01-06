@@ -35,7 +35,6 @@ import {
 import NavigationTabs from '@/components/anamnese/NavigationTabs';
 import IdentificationSection from '@/components/anamnese/sections/IdentificationSection';
 import InfosGenerales from '@/components/anamnese/sections/InfosGenerales';
-import BesoinsVisuelsSection from '@/components/anamnese/sections/BesoinsVisuelsSection';
 import ActivitesSection from '@/components/anamnese/sections/ActivitesSection';
 import EssaiCompensationSection from '@/components/anamnese/sections/EssaiCompensationSection';
 import AncienneCorrectionSection from '@/components/anamnese/sections/AncienneCorrectionSection';
@@ -45,7 +44,6 @@ import LivraisonSuiviSection from '@/components/anamnese/sections/LivraisonSuivi
 const tabs = [
   { id: 'identification', label: 'Identification', icon: User },
   { id: 'anamnese', label: 'Informations générales', icon: ClipboardList },
-  { id: 'besoins', label: 'Besoins', icon: Glasses },
   { id: 'activites', label: 'Activités', icon: Activity },
   { id: 'essai', label: 'Essai', icon: TestTube2 },
   { id: 'ancienne', label: 'Ancienne', icon: History },
@@ -106,8 +104,6 @@ export default function EditerFiche() {
         return <IdentificationSection {...props} />;
       case 'anamnese':
         return <InfosGenerales {...props} />;
-      case 'besoins':
-        return <BesoinsVisuelsSection {...props} />;
       case 'activites':
         return <ActivitesSection {...props} />;
       case 'essai':
