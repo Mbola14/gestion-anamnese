@@ -4,16 +4,16 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createPageUrl } from '@/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Save, 
-  ArrowLeft, 
-  User, 
-  ClipboardList, 
-  Glasses, 
-  Activity, 
-  TestTube2, 
-  History, 
-  Settings, 
+import {
+  Save,
+  ArrowLeft,
+  User,
+  ClipboardList,
+  Glasses,
+  Activity,
+  TestTube2,
+  History,
+  Settings,
   Truck,
   CheckCircle,
   Loader2,
@@ -34,21 +34,17 @@ import {
 
 import NavigationTabs from '@/components/anamnese/NavigationTabs';
 import IdentificationSection from '@/components/anamnese/sections/IdentificationSection';
-import AnamneseSection from '@/components/anamnese/sections/AnamneseSection';
-import BesoinsVisuelsSection from '@/components/anamnese/sections/BesoinsVisuelsSection';
+import InfosGenerales from '@/components/anamnese/sections/InfosGenerales';
 import ActivitesSection from '@/components/anamnese/sections/ActivitesSection';
 import EssaiCompensationSection from '@/components/anamnese/sections/EssaiCompensationSection';
-import AncienneCorrectionSection from '@/components/anamnese/sections/AncienneCorrectionSection';
 import ControleEquipementSection from '@/components/anamnese/sections/ControleEquipementSection';
 import LivraisonSuiviSection from '@/components/anamnese/sections/LivraisonSuiviSection';
 
 const tabs = [
   { id: 'identification', label: 'Identification', icon: User },
-  { id: 'anamnese', label: 'Anamnèse', icon: ClipboardList },
-  { id: 'besoins', label: 'Besoins', icon: Glasses },
+  { id: 'anamnese', label: 'Informations générales', icon: ClipboardList },
   { id: 'activites', label: 'Activités', icon: Activity },
   { id: 'essai', label: 'Essai', icon: TestTube2 },
-  { id: 'ancienne', label: 'Ancienne', icon: History },
   { id: 'controle', label: 'Contrôle', icon: Settings },
   { id: 'livraison', label: 'Livraison', icon: Truck }
 ];
@@ -105,15 +101,11 @@ export default function EditerFiche() {
       case 'identification':
         return <IdentificationSection {...props} />;
       case 'anamnese':
-        return <AnamneseSection {...props} />;
-      case 'besoins':
-        return <BesoinsVisuelsSection {...props} />;
+        return <InfosGenerales {...props} />;
       case 'activites':
         return <ActivitesSection {...props} />;
       case 'essai':
         return <EssaiCompensationSection {...props} />;
-      case 'ancienne':
-        return <AncienneCorrectionSection {...props} />;
       case 'controle':
         return <ControleEquipementSection {...props} />;
       case 'livraison':
