@@ -12,7 +12,7 @@ export default function ControleEquipementSection({ data, onChange }) {
   return (
     <div className="space-y-6">
       <SectionHeader title="Contrôle Équipements" icon={Settings} />
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 1er Équipement */}
         <div className="p-5 bg-white rounded-xl border-2 border-blue-200 shadow-sm">
@@ -73,6 +73,23 @@ export default function ControleEquipementSection({ data, onChange }) {
             </div>
           </div>
         </div>
+
+
+        {/* Opticien */}
+        <TouchInput
+          label="Opticien"
+          value={data.controle_opticien}
+          onChange={(v) => handleChange('controle_opticien', v)}
+          placeholder="Sélectionner l’opticien"
+        />
+
+        {/* Sécurité monture métal */}
+        <TouchCheckbox
+          label="Si monture en métal : pointage ou Loctite effectué dans les charnières de face"
+          checked={data.securite_monture_metal}
+          onChange={(v) => handleChange('securite_monture_metal', v)}
+        />
+
       </div>
     </div>
   );
