@@ -26,7 +26,6 @@ import IdentificationSection from '@/components/anamnese/sections/Identification
 import InfosGenerales from '@/components/anamnese/sections/InfosGenerales';
 import ActivitesSection from '@/components/anamnese/sections/ActivitesSection';
 import EssaiCompensationSection from '@/components/anamnese/sections/EssaiCompensationSection';
-import AncienneCorrectionSection from '@/components/anamnese/sections/AncienneCorrectionSection';
 import ControleEquipementSection from '@/components/anamnese/sections/ControleEquipementSection';
 import LivraisonSuiviSection from '@/components/anamnese/sections/LivraisonSuiviSection';
 
@@ -35,7 +34,6 @@ const tabs = [
   { id: 'anamnese', label: 'Informations générales', icon: ClipboardList },
   { id: 'activites', label: 'Activités', icon: Activity },
   { id: 'essai', label: 'Essai', icon: TestTube2 },
-  { id: 'ancienne', label: 'Ancienne', icon: History },
   { id: 'controle', label: 'Contrôle', icon: Settings },
   { id: 'livraison', label: 'Livraison', icon: Truck }
 ];
@@ -131,8 +129,6 @@ export default function NouvelleFiche() {
         return <ActivitesSection {...props} />;
       case 'essai':
         return <EssaiCompensationSection {...props} />;
-      case 'ancienne':
-        return <AncienneCorrectionSection {...props} />;
       case 'controle':
         return <ControleEquipementSection {...props} />;
       case 'livraison':
