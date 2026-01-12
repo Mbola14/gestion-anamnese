@@ -43,6 +43,7 @@ export default function NouvelleFiche() {
   const [activeTab, setActiveTab] = useState('identification');
   const [showSuccess, setShowSuccess] = useState(false);
   const [penicheData, setpenicheData] = useState(null);
+  const [opticians, setOpticians] = useState([]);
 
   const [formData, setFormData] = useState({
     date_visite: format(new Date(), 'yyyy-MM-dd'),
@@ -56,24 +57,45 @@ export default function NouvelleFiche() {
       return;
     }
 
-    const onPageLoad = (data) => {
-      console.log("CURRENT PENICHE 1 :", data);
+    const onPageLoad = async (data) => {
+      console.log("CURRENT PENICHE :", data);
       setpenicheData(data);
+
+      try {
+        const res = await ZOHO.CRM.API.getAllRecords({
+          Entity: "Opticiens",
+          sort_order: "asc",
+          per_page: 200,
+          page: 1
+        });
+
+        if (res?.data) {
+          const list = res.data
+            .map(o => ({
+              id: o.id,
+              prenom: o.Pr_nom
+            }))
+            .filter(Boolean);
+
+          setOpticians(list);
+          console.log("LES DATA RES :", res.data);
+        }
+      } catch (e) {
+        console.error("Erreur fetch opticiens :", e);
+      }
     };
 
-    window.ZOHO.embeddedApp.on("PageLoad", onPageLoad);
-    window.ZOHO.embeddedApp.init();
+    ZOHO.embeddedApp.on("PageLoad", onPageLoad);
+    ZOHO.embeddedApp.init();
 
     return () => {
-      // Zoho ne fournit pas toujours off(), mais on protège quand même
       try {
-        window.ZOHO.embeddedApp.off?.("PageLoad", onPageLoad);
-      } catch (e) {
-        // silencieux
-      }
+        ZOHO.embeddedApp.off?.("PageLoad", onPageLoad);
+      } catch { }
     };
   }, []);
 
+  console.log("OPTICIENS FETCHÉS :", opticians);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.FicheAnamnese.create(data),
@@ -87,7 +109,7 @@ export default function NouvelleFiche() {
 
   const createZohoAnamnese = async () => {
     const current_deal_id = penicheData?.EntityId;
-    console.log("ID PENICHE : " , current_deal_id);
+    console.log("ID PENICHE : ", current_deal_id);
 
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(' ');
     let json_data = {
@@ -98,7 +120,7 @@ export default function NouvelleFiche() {
         }
       ]
     };
-    
+
     return ZOHO.CRM.CONNECTION.invoke("zcrm", {
       url: "https://www.zohoapis.eu/crm/v8/Anamneses",
       method: "POST",
@@ -122,7 +144,7 @@ export default function NouvelleFiche() {
 
     switch (activeTab) {
       case 'identification':
-        return <IdentificationSection {...props} />;
+        return <IdentificationSection {...props} opticians={opticians} />;
       case 'anamnese':
         return <InfosGenerales {...props} />;
       case 'activites':
@@ -132,7 +154,7 @@ export default function NouvelleFiche() {
       case 'controle':
         return <ControleEquipementSection {...props} />;
       case 'livraison':
-        return <LivraisonSuiviSection {...props} />;
+        return <LivraisonSuiviSection {...props} opticians={opticians} />;
       default:
         return null;
     }
