@@ -210,26 +210,26 @@ export default function NouvelleFiche() {
 
 
           // === CONTRÔLE ===
-          Opticien_contr_le: formData.opticien_controle
-            ? { id: formData.opticien_controle }
+          Opticien_contr_le: formData.controle_opticien
+            ? { id: formData.controle_opticien }
             : null,
           Premier_quipement_vis: formData.controle_1er_vis,
           Premier_quipement_polissage: formData.controle_1er_polissage,
           Premier_quipement_transition: formData.controle_1er_transition,
-          Opticien_premier_quipement: formData.opticien_1er
-            ? { id: formData.opticien_1er }
+          Opticien_premier_quipement: formData.controle_1er_opticien
+            ? { id: formData.controle_1er_opticien }
             : null,
           Deuxi_me_quipement_vis: formData.controle_2eme_vis,
           Deuxi_me_quipement_polissage: formData.controle_2eme_polissage,
           Deuxi_me_quipement_transition: formData.controle_2eme_transition,
-          Opticien_deuxi_me_quipement: formData.opticien_2eme
-            ? { id: formData.opticien_2eme }
+          Opticien_deuxi_me_quipement: formData.controle_2eme_opticien
+            ? { id: formData.controle_2eme_opticien }
             : null,
           S_curit_monture_m_tal: formData.securite_monture_metal,
 
           // === LIVRAISON ===
-          Opticien_livraison: formData.opticien_livraison
-            ? { id: formData.opticien_livraison }
+          Opticien_livraison: formData.livraison_opticien
+            ? { id: formData.livraison_opticien }
             : null,
           Acuit_ODG_livraison: formData.acuite_odg,
           Ressenti_client: formData.ressenti_client,
@@ -270,7 +270,7 @@ export default function NouvelleFiche() {
       case 'essai':
         return <EssaiCompensationSection {...props} />;
       case 'controle':
-        return <ControleEquipementSection {...props} />;
+        return <ControleEquipementSection {...props} opticians={opticians} />;
       case 'livraison':
         return <LivraisonSuiviSection {...props} opticians={opticians} />;
       default:
