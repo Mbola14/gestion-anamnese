@@ -5,6 +5,7 @@ import DataGrid from '../DataGrid';
 import TouchInput from '../TouchInput';
 import TouchTextarea from '../TouchTextarea';
 import TouchCheckbox from '../TouchCheckbox';
+import TouchToggle from "../TouchToggle";
 
 export default function EssaiCompensationSection({ data, onChange }) {
   const handleChange = (field, value) => {
@@ -41,12 +42,18 @@ export default function EssaiCompensationSection({ data, onChange }) {
             onChange={(v) => handleChange('date_ancien_equipement', v)}
           />
 
-          <TouchInput
-            label="Type de verres portés"
-            value={data.type_verres_ancien}
-            onChange={(v) => handleChange('type_verres_ancien', v)}
-            placeholder="Unifocal, progressif…"
-          />
+          {/* 2. Type de verres portés */}
+          <div className="p-4 rounded-xl border bg-muted/30">
+            <div className="font-medium mb-3">Type d’équipement</div>
+            <TouchToggle
+              options={[
+                { value: "Unifocal", label: "Unifocal" },
+                { value: "Progressif", label: "Progressif" },
+              ]}
+              value={data.type_verres_ancien || ""}
+              onChange={(v) => handleChange('type_verres_ancien', v)}
+            />
+          </div>
         </div>
 
         <TouchInput

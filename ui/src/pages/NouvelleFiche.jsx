@@ -178,9 +178,10 @@ export default function NouvelleFiche() {
 
 
           // === ESSAI DE COMPENSATION ===
-          Type_de_verres_port_s: formData.type_verres,
-          Ancienne_correction_OD_OG: formData.ancienne_correction,
-          Nouvelle_correction_OD_OG: formData.nouvelle_correction,
+          Type_de_verres_port_s: formData.type_verres_ancien,
+          Ancienne_correction_OD_OG: formData.correction_ancienne,
+          Date_derni_re_facture: formData.date_ancien_equipement,
+          Nouvelle_correction_OD_OG: formData.correction_nouvelle,
           AV_VL_OD: formData.av_vl_od,
           AV_VL_OG: formData.av_vl_og,
           AV_VL_ODG: formData.av_vl_odg,
