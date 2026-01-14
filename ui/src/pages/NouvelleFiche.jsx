@@ -107,6 +107,14 @@ export default function NouvelleFiche() {
     }
   });
 
+  const getTriStateValue = (up, equal, down) => {
+    if (up) return "Montée";
+    if (equal) return "Stable";
+    if (down) return "Chute";
+    return null;
+  };
+
+
   const createZohoAnamnese = async () => {
     const current_deal_id = penicheData?.EntityId;
     console.log("ID PENICHE : ", current_deal_id);
@@ -138,7 +146,7 @@ export default function NouvelleFiche() {
           Port_de_lentilles: formData.port_lentilles,
           Ressenti_des_yeux: formData.sentez_vos_yeux,
 
-          
+
           // === ACTIVITÉS ===
           // ----- VISION DE LOIN (VL)
           Conduite_automobile: formData.vl_conduite_auto,
@@ -188,8 +196,17 @@ export default function NouvelleFiche() {
           AV_VP_OD: formData.av_vp_od,
           AV_VP_OG: formData.av_vp_og,
           AV_VP_ODG: formData.av_vp_odg,
-          Test_0_25: formData.test_025,
-          Test_0_50: formData.test_050,
+          Test_0_25: getTriStateValue(
+            formData.test_025_up,
+            formData.test_025_equal,
+            formData.test_025_down
+          ),
+
+          Test_0_50: getTriStateValue(
+            formData.test_05_up,
+            formData.test_05_equal,
+            formData.test_05_down
+          ),
 
           // === CONTRÔLE ===
           Opticien_contr_le: formData.opticien_controle
