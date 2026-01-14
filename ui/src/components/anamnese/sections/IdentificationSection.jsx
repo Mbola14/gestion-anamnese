@@ -87,9 +87,9 @@ export default function IdentificationSection({ data, onChange, opticians = [] }
             <option value="" disabled>
               Choisir un opticien…
             </option>
-            {opticians.map((name) => (
-              <option key={name} value={name}>
-                {name}
+            {opticians.map((optician) => (
+              <option key={optician.id} value={optician.id}>
+                {optician.prenom}
               </option>
             ))}
           </select>
