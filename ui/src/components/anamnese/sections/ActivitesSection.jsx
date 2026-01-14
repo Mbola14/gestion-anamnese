@@ -86,7 +86,7 @@ export default function ActivitesSection({ data, onChange }) {
         </div>
       </div>
 
-      {/* 1️⃣ VL */}
+      {/* 1️ VL */}
       <div className="p-4 rounded-xl border bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
         <div className="flex items-center gap-2 mb-4">
           <Car className="w-5 h-5 text-emerald-600" />
@@ -116,7 +116,7 @@ export default function ActivitesSection({ data, onChange }) {
         </div>
       </div>
 
-      {/* 2️⃣ VI */}
+      {/* 2️ VI */}
       <div className="p-4 rounded-xl border bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
         <div className="flex items-center gap-2 mb-4">
           <Monitor className="w-5 h-5 text-blue-600" />
@@ -146,7 +146,7 @@ export default function ActivitesSection({ data, onChange }) {
         </div>
       </div>
 
-      {/* 3️⃣ VP */}
+      {/* 3️ VP */}
       <div className="p-4 rounded-xl border bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="w-5 h-5 text-purple-600" />
