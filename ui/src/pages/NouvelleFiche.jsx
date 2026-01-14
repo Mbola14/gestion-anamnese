@@ -113,10 +113,101 @@ export default function NouvelleFiche() {
 
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(' ');
     let json_data = {
-      "data": [
+      data: [
         {
-          "Name": fullName ? `Anamnese - ${fullName}` : 'Anamnese',
-          "Email": formData.email,
+          // === IDENTIFICATION ===
+          Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
+          Email: formData.email,
+          Nom: formData.nom,
+          Pr_nom: formData.prenom,
+          Date_de_naissance: formData.date_naissance,
+          Nouveau_client: formData.nouveau_client,
+          Date_de_visite: formData.date_visite,
+          Opticien_visite: formData.opticien_visite
+            ? { id: formData.opticien_visite }
+            : null,
+
+          // === INFORMATIONS GÉNÉRALES ===
+          Premi_re_lunette: formData.type_equipement_premiere_lunette,
+          Premier_progressif: formData.type_equipement_premier_progressif,
+          Renouvellement: formData.type_equipement_renouvellement,
+          carts_pupillaires_OD_OG: formData.ecarts_pupillaires,
+          Motif_de_la_visite_boutique: formData.motif_visite_boutique,
+          Motif_Qualissime: formData.motif_qualissime,
+          Motif_Perte_de_lunettes: formData.motif_perte_lunettes,
+          Sant_oculaire_PIO_FO: formData.sante_oculaire,
+          Orthoptie_exercices_r_alis_s: formData.orthoptie,
+          Port_de_lentilles: formData.port_lentilles,
+          Ressenti_des_yeux: formData.ressenti_yeux,
+
+          // === ACTIVITÉS ===
+          Ordinateur_fixe: formData.ordinateur_fixe,
+          Ordinateur_portable: formData.ordinateur_portable,
+          Double_cran: formData.double_ecran,
+          cran_prolong: formData.ecran_prolonge,
+          T_l_phone_smartphone: formData.smartphone,
+          T_l_vision: formData.television,
+          Lecture_intensive: formData.lecture_intensive,
+          Lecture_occasionnelle: formData.lecture_occasionnelle,
+          criture: formData.ecriture,
+          Activit_s_de_pr_cision: formData.activites_precision,
+          Couture_tricot: formData.couture_tricot,
+          Cuisine: formData.cuisine,
+          Bricolage: formData.bricolage,
+          Activit_manuelle: formData.activite_manuelle,
+          Sport_ext_rieur: formData.sport_exterieur,
+          Marche_ext_rieur: formData.marche_exterieur,
+          V_lo_deux_roues: formData.velo,
+          Voyage_fr_quent: formData.voyage_frequent,
+          Conduite_automobile: formData.conduite_auto,
+          Conduite_de_nuit: formData.conduite_nuit,
+          Observation_distance: formData.observation_distance,
+          Lecture_de_panneaux: formData.lecture_panneaux,
+          Dessin_peinture: formData.dessin_peinture,
+          Enseignement_pr_sentation: formData.enseignement,
+          Autres_activit_s_VL: formData.autres_activites_vl,
+          Autres_activit_s_VI: formData.autres_activites_vi,
+          Autres_activit_s_VP: formData.autres_activites_vp,
+
+          // === ESSAI DE COMPENSATION ===
+          Type_de_verres_port_s: formData.type_verres,
+          Ancienne_correction_OD_OG: formData.ancienne_correction,
+          Nouvelle_correction_OD_OG: formData.nouvelle_correction,
+          AV_VL_OD: formData.av_vl_od,
+          AV_VL_OG: formData.av_vl_og,
+          AV_VL_ODG: formData.av_vl_odg,
+          AV_VP_OD: formData.av_vp_od,
+          AV_VP_OG: formData.av_vp_og,
+          AV_VP_ODG: formData.av_vp_odg,
+          Test_0_25: formData.test_025,
+          Test_0_50: formData.test_050,
+
+          // === CONTRÔLE ===
+          Opticien_contr_le: formData.opticien_controle
+            ? { id: formData.opticien_controle }
+            : null,
+          Premier_quipement_vis: formData.controle_1er_vis,
+          Premier_quipement_polissage: formData.controle_1er_polissage,
+          Premier_quipement_transition: formData.controle_1er_transition,
+          Opticien_premier_quipement: formData.opticien_1er
+            ? { id: formData.opticien_1er }
+            : null,
+          Deuxi_me_quipement_vis: formData.controle_2eme_vis,
+          Deuxi_me_quipement_polissage: formData.controle_2eme_polissage,
+          Deuxi_me_quipement_transition: formData.controle_2eme_transition,
+          Opticien_deuxi_me_quipement: formData.opticien_2eme
+            ? { id: formData.opticien_2eme }
+            : null,
+          S_curit_monture_m_tal: formData.securite_monture_metal,
+
+          // === LIVRAISON ===
+          Opticien_livraison: formData.opticien_livraison
+            ? { id: formData.opticien_livraison }
+            : null,
+          Acuit_ODG_livraison: formData.acuite_odg,
+          Ressenti_client: formData.ressenti_client,
+          Points_de_vigilance: formData.points_vigilance,
+          Satisfaction: formData.satisfaction_client
         }
       ]
     };
