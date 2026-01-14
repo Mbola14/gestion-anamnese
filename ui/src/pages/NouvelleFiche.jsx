@@ -131,12 +131,12 @@ export default function NouvelleFiche() {
           Type_d_quipement: formData.type_equipement,
           carts_pupillaires_OD_OG: formData.ecarts_pupillaires,
           Motif_de_la_visite_boutique: formData.motif_visite_boutique,
-          Motif_Qualissime: formData.motif_qualissime,
-          Motif_Perte_de_lunettes: formData.motif_perte_lunettes,
+          Motif_Qualissime: formData.autre_raison_qualissime,
+          Motif_Perte_de_lunettes: formData.autre_raison_perte_lunettes,
           Sant_oculaire_PIO_FO: formData.sante_oculaire,
           Orthoptie_exercices_r_alis_s: formData.orthoptie,
           Port_de_lentilles: formData.port_lentilles,
-          Ressenti_des_yeux: formData.ressenti_yeux,
+          Ressenti_des_yeux: formData.sentez_vos_yeux,
 
           // === ACTIVITÉS ===
           Ordinateur_fixe: formData.ordinateur_fixe,
