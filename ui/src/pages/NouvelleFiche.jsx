@@ -128,9 +128,7 @@ export default function NouvelleFiche() {
             : null,
 
           // === INFORMATIONS GÉNÉRALES ===
-          Premi_re_lunette: formData.type_equipement_premiere_lunette,
-          Premier_progressif: formData.type_equipement_premier_progressif,
-          Renouvellement: formData.type_equipement_renouvellement,
+          Type_d_quipement: formData.type_equipement,
           carts_pupillaires_OD_OG: formData.ecarts_pupillaires,
           Motif_de_la_visite_boutique: formData.motif_visite_boutique,
           Motif_Qualissime: formData.motif_qualissime,

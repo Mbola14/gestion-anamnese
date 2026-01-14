@@ -18,9 +18,9 @@ export default function InfosGenerales({ data, onChange }) {
         <div className="font-medium mb-3">Type d’équipement</div>
         <TouchToggle
           options={[
-            { value: "premiere_lunette", label: "1ère lunette" },
-            { value: "premier_progressif", label: "1er progressif" },
-            { value: "renouvellement", label: "Renouvellement" },
+            { value: "1ère lunette", label: "1ère lunette" },
+            { value: "1er progressif", label: "1er progressif" },
+            { value: "Renouvellement", label: "Renouvellement" },
           ]}
           value={data.type_equipement || ""}
           onChange={(v) => handleChange("type_equipement", v)}
