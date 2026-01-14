@@ -117,7 +117,7 @@ export default function NouvelleFiche() {
 
   const createZohoAnamnese = async () => {
     const current_deal_id = penicheData?.EntityId;
-    console.log("ID PENICHE : ", current_deal_id);
+    console.log("ID PENICHE A : ", formData.peniche_id);
 
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(' ');
     let json_data = {
@@ -201,12 +201,13 @@ export default function NouvelleFiche() {
             formData.test_025_equal,
             formData.test_025_down
           ),
-
           Test_0_50: getTriStateValue(
             formData.test_05_up,
             formData.test_05_equal,
             formData.test_05_down
           ),
+          P_niche: formData.peniche_id ? { id: formData.peniche_id } : null,
+
 
           // === CONTRÔLE ===
           Opticien_contr_le: formData.opticien_controle

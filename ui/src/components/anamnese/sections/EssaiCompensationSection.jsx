@@ -6,6 +6,8 @@ import TouchInput from '../TouchInput';
 import TouchTextarea from '../TouchTextarea';
 import TouchCheckbox from '../TouchCheckbox';
 import TouchToggle from "../TouchToggle";
+import PenicheSearch from './PenicheSearch';
+
 
 export default function EssaiCompensationSection({ data, onChange }) {
   const handleChange = (field, value) => {
@@ -134,11 +136,7 @@ export default function EssaiCompensationSection({ data, onChange }) {
       {/* Affectation de péniche */}
       <div className="p-4 rounded-xl border bg-white space-y-4">
         <div className="font-semibold">Affectation de péniche</div>
-        <TouchInput
-          label="Péniche"
-          value={data.peniche}
-          onChange={(v) => handleChange('peniche', v)}
-        />
+        <PenicheSearch data={data} onChange={onChange} />
       </div>
 
     </div>
