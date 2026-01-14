@@ -81,8 +81,8 @@ export default function IdentificationSection({ data, onChange, opticians = [] }
           <label className="block text-sm font-medium">Opticien</label>
           <select
             className="w-full rounded-xl border px-3 py-3 bg-background"
-            value={data.opticien || ""}
-            onChange={(e) => handleChange("opticien", e.target.value)}
+            value={data.opticien_visite || ""}
+            onChange={(e) => handleChange("opticien_visite", e.target.value)}
           >
             <option value="" disabled>
               Choisir un opticien…
