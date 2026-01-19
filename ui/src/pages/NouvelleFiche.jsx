@@ -114,17 +114,17 @@ export default function NouvelleFiche() {
     return null;
   };
 
+  // ✅ Remplace UNIQUEMENT handleSave + createZohoAnamnese par ces versions.
+  // (Ton create_contact peut rester tel quel.)
 
-  const createZohoAnamnese = async () => {
-    const current_deal_id = penicheData?.EntityId;
-    console.log("ID PENICHE A : ", formData.peniche_id);
+  const createZohoAnamnese = async (contactId) => {
+    const fullName = [formData.prenom, formData.nom].filter(Boolean).join(" ");
 
-    const fullName = [formData.prenom, formData.nom].filter(Boolean).join(' ');
-    let json_data = {
+    const json_data = {
       data: [
         {
           // === IDENTIFICATION ===
-          Contact: { id: formData.contact_id },
+          Contact: contactId ? { id: contactId } : null, // ✅ IMPORTANT
           Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
           Email: formData.email,
           Nom: formData.nom,
@@ -132,9 +132,7 @@ export default function NouvelleFiche() {
           Date_de_naissance: formData.date_naissance,
           Nouveau_client: formData.nouveau_client,
           Date_de_visite: formData.date_visite,
-          Opticien_visite: formData.opticien_visite
-            ? { id: formData.opticien_visite }
-            : null,
+          Opticien_visite: formData.opticien_visite ? { id: formData.opticien_visite } : null,
 
           // === INFORMATIONS GÉNÉRALES ===
           Type_d_quipement: formData.type_equipement,
@@ -148,7 +146,6 @@ export default function NouvelleFiche() {
           Ressenti_des_yeux: formData.sentez_vos_yeux,
 
           // === ACTIVITÉS ===
-          // ----- VISION DE LOIN (VL)
           Conduite_automobile: formData.vl_conduite_auto,
           Conduite_de_nuit: formData.vl_conduite_nuit,
           Marche_ext_rieur: formData.vl_marche_exterieur,
@@ -159,7 +156,6 @@ export default function NouvelleFiche() {
           Lecture_de_panneaux: formData.vl_lecture_panneaux,
           Autres_activit_s_VL: formData.autres_activites_vl,
 
-          // ----- VISION INTERMÉDIAIRE (VI)
           Ordinateur_fixe: formData.vi_ordinateur_fixe,
           Ordinateur_portable: formData.vi_ordinateur_portable,
           Double_cran: formData.vi_double_ecran,
@@ -172,7 +168,6 @@ export default function NouvelleFiche() {
           Commerce_accueil_client: formData.vi_commerce,
           Autres_activit_s_VI: formData.autres_activites_vi,
 
-          // ----- VISION DE PRÈS (VP)
           Lecture_intensive: formData.vp_lecture_intensive,
           Lecture_occasionnelle: formData.vp_lecture_occasionnelle,
           T_l_phone_smartphone: formData.vp_smartphone,
@@ -195,65 +190,134 @@ export default function NouvelleFiche() {
           AV_VP_OD: formData.av_vp_od,
           AV_VP_OG: formData.av_vp_og,
           AV_VP_ODG: formData.av_vp_odg,
-          Test_0_25: getTriStateValue(
-            formData.test_025_up,
-            formData.test_025_equal,
-            formData.test_025_down
-          ),
-          Test_0_50: getTriStateValue(
-            formData.test_05_up,
-            formData.test_05_equal,
-            formData.test_05_down
-          ),
+          Test_0_25: getTriStateValue(formData.test_025_up, formData.test_025_equal, formData.test_025_down),
+          Test_0_50: getTriStateValue(formData.test_05_up, formData.test_05_equal, formData.test_05_down),
           P_niche: formData.peniche_id ? { id: formData.peniche_id } : null,
 
           // === CONTRÔLE ===
-          Opticien_contr_le: formData.controle_opticien
-            ? { id: formData.controle_opticien }
-            : null,
+          Opticien_contr_le: formData.controle_opticien ? { id: formData.controle_opticien } : null,
           Premier_quipement_vis: formData.controle_1er_vis,
           Premier_quipement_polissage: formData.controle_1er_polissage,
           Premier_quipement_transition: formData.controle_1er_transition,
-          Opticien_premier_quipement: formData.controle_1er_opticien
-            ? { id: formData.controle_1er_opticien }
-            : null,
+          Opticien_premier_quipement: formData.controle_1er_opticien ? { id: formData.controle_1er_opticien } : null,
           Deuxi_me_quipement_vis: formData.controle_2eme_vis,
           Deuxi_me_quipement_polissage: formData.controle_2eme_polissage,
           Deuxi_me_quipement_transition: formData.controle_2eme_transition,
-          Opticien_deuxi_me_quipement: formData.controle_2eme_opticien
-            ? { id: formData.controle_2eme_opticien }
-            : null,
+          Opticien_deuxi_me_quipement: formData.controle_2eme_opticien ? { id: formData.controle_2eme_opticien } : null,
           S_curit_monture_m_tal: formData.securite_monture_metal,
 
           // === LIVRAISON ===
-          Opticien_livraison: formData.livraison_opticien
-            ? { id: formData.livraison_opticien }
-            : null,
+          Opticien_livraison: formData.livraison_opticien ? { id: formData.livraison_opticien } : null,
           Acuit_ODG_livraison: formData.acuite_odg,
           Ressenti_client: formData.ressenti_client,
           Points_de_vigilance: formData.points_vigilance,
-          Satisfaction: formData.satisfaction_client
-        }
-      ]
+          Satisfaction: formData.satisfaction_client,
+        },
+      ],
     };
+
+    console.log("ID CONTACT A ASSOCIER (UTILISÉ) :", contactId);
 
     return ZOHO.CRM.CONNECTION.invoke("zcrm", {
       url: "https://www.zohoapis.eu/crm/v8/Anamneses",
       method: "POST",
-      parameters: json_data
+      parameters: json_data,
     })
-      .then(function (response) {
+      .then((response) => {
         console.log("Anamnese created successfully:", response);
+        return response;
       })
       .catch((error) => {
         console.error("Error creating anamnese:", error);
+        throw error;
       });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log("peniche data au save :", penicheData);
-    createZohoAnamnese();
+
+    // ✅ 1) créer/trouver le contact
+    const contactId = await create_contact();
+    if (!contactId) {
+      console.error("Impossible de créer/trouver le contact. Vérifie nom + email.");
+      return;
+    }
+
+    // ✅ 2) IMPORTANT : on écrit immédiatement dans le state pour UI
+    setFormData((prev) => ({ ...prev, contact_id: contactId }));
+
+    // ✅ 3) on passe l'id DIRECTEMENT à la création Anamnèse (pas via formData, car setState est async)
+    await createZohoAnamnese(contactId);
   };
+
+
+  const create_contact = async () => {
+    // Si déjà sélectionné via ContactSearch -> rien à faire
+    if (formData.contact_id) return formData.contact_id;
+
+    // Si pas de données minimales -> on ne crée pas
+    const nom = (formData.nom || "").trim();
+    const prenom = (formData.prenom || "").trim();
+    const email = (formData.email || "").trim();
+
+    if (!nom || !email) return null;
+
+    // 1) Chercher un contact existant par email (le plus fiable)
+    try {
+      const search = await ZOHO.CRM.API.searchRecord({
+        Entity: "Contacts",
+        Type: "criteria",
+        Query: `(Email:equals:${email})`,
+        page: 1,
+        per_page: 1,
+      });
+
+      const existing = search?.data?.[0];
+      if (existing?.id) {
+        console.log("Contact existant donc création annulé.");
+
+        setFormData((prev) => ({ ...prev, contact_id: existing.id }));
+        return existing.id;
+      }
+    } catch (e) {
+      // on ignore et on tente la création
+    }
+
+    // 2) Créer le contact
+    const payload = {
+      data: [
+        {
+          Last_Name: nom,
+          First_Name: prenom || undefined,
+          Email: email,
+          Date_of_Birth: formData.date_naissance || undefined,
+        },
+      ],
+    };
+
+    try {
+      const resp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Contacts",
+        APIData: payload.data[0],
+        Trigger: ["workflow"],
+      });
+      console.log("CREATE CONTACT : ", resp);
+
+
+      const newId = resp?.data?.[0]?.details?.id;
+
+      if (newId) {
+        setFormData((prev) => ({ ...prev, contact_id: newId }));
+        return newId;
+      }
+    } catch (e) {
+      console.error("Erreur création contact :", e);
+    }
+
+    return null;
+  };
+
+
 
   const renderSection = () => {
     const props = { data: formData, onChange: setFormData };
@@ -313,7 +377,7 @@ export default function NouvelleFiche() {
             </div>
             <Button
               onClick={handleSave}
-              disabled={createMutation.isPending || !formData.nom || !formData.email}
+              disabled={createMutation.isPending || !formData.nom}
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-3 flex items-center gap-2 shadow-lg shadow-blue-600/30"
             >
               {createMutation.isPending ? (

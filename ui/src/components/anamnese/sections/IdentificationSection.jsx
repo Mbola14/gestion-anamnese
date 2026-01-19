@@ -70,7 +70,7 @@ export default function IdentificationSection({ data, onChange, opticians = [] }
               required
             />
             <TouchInput
-              label="Email *"
+              label="Email"
               value={data.email || ""}
               onChange={(v) => setField("email", v)}
               placeholder="email@exemple.com"
