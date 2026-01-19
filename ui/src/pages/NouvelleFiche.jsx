@@ -124,6 +124,7 @@ export default function NouvelleFiche() {
       data: [
         {
           // === IDENTIFICATION ===
+          Contact: { id: formData.contact_id },
           Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
           Email: formData.email,
           Nom: formData.nom,
@@ -145,7 +146,6 @@ export default function NouvelleFiche() {
           Orthoptie_exercices_r_alis_s: formData.orthoptie,
           Port_de_lentilles: formData.port_lentilles,
           Ressenti_des_yeux: formData.sentez_vos_yeux,
-
 
           // === ACTIVITÉS ===
           // ----- VISION DE LOIN (VL)
@@ -184,7 +184,6 @@ export default function NouvelleFiche() {
           Activit_s_de_pr_cision: formData.vp_precision,
           Autres_activit_s_VP: formData.autres_activites_vp,
 
-
           // === ESSAI DE COMPENSATION ===
           Type_de_verres_port_s: formData.type_verres_ancien,
           Ancienne_correction_OD_OG: formData.correction_ancienne,
@@ -207,7 +206,6 @@ export default function NouvelleFiche() {
             formData.test_05_down
           ),
           P_niche: formData.peniche_id ? { id: formData.peniche_id } : null,
-
 
           // === CONTRÔLE ===
           Opticien_contr_le: formData.controle_opticien
