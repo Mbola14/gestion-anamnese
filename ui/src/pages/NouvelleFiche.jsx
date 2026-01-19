@@ -126,10 +126,6 @@ export default function NouvelleFiche() {
           // === IDENTIFICATION ===
           Contact: contactId ? { id: contactId } : null, // ✅ IMPORTANT
           Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
-          Email: formData.email,
-          Nom: formData.nom,
-          Pr_nom: formData.prenom,
-          Date_de_naissance: formData.date_naissance,
           Nouveau_client: formData.nouveau_client,
           Date_de_visite: formData.date_visite,
           Opticien_visite: formData.opticien_visite ? { id: formData.opticien_visite } : null,
