@@ -107,16 +107,134 @@ export default function NouvelleFiche() {
     }
   });
 
+  const getTriStateValue = (up, equal, down) => {
+    if (up) return "Montée";
+    if (equal) return "Stable";
+    if (down) return "Chute";
+    return null;
+  };
+
+
   const createZohoAnamnese = async () => {
     const current_deal_id = penicheData?.EntityId;
-    console.log("ID PENICHE : ", current_deal_id);
+    console.log("ID PENICHE A : ", formData.peniche_id);
 
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(' ');
     let json_data = {
-      "data": [
+      data: [
         {
-          "Name": fullName ? `Anamnese - ${fullName}` : 'Anamnese',
-          "Email": formData.email,
+          // === IDENTIFICATION ===
+          Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
+          Email: formData.email,
+          Nom: formData.nom,
+          Pr_nom: formData.prenom,
+          Date_de_naissance: formData.date_naissance,
+          Nouveau_client: formData.nouveau_client,
+          Date_de_visite: formData.date_visite,
+          Opticien_visite: formData.opticien_visite
+            ? { id: formData.opticien_visite }
+            : null,
+
+          // === INFORMATIONS GÉNÉRALES ===
+          Type_d_quipement: formData.type_equipement,
+          carts_pupillaires_OD_OG: formData.ecarts_pupillaires,
+          Motif_de_la_visite_boutique: formData.motif_visite_boutique,
+          Motif_Qualissime: formData.autre_raison_qualissime,
+          Motif_Perte_de_lunettes: formData.autre_raison_perte_lunettes,
+          Sant_oculaire_PIO_FO: formData.sante_oculaire,
+          Orthoptie_exercices_r_alis_s: formData.orthoptie,
+          Port_de_lentilles: formData.port_lentilles,
+          Ressenti_des_yeux: formData.sentez_vos_yeux,
+
+
+          // === ACTIVITÉS ===
+          // ----- VISION DE LOIN (VL)
+          Conduite_automobile: formData.vl_conduite_auto,
+          Conduite_de_nuit: formData.vl_conduite_nuit,
+          Marche_ext_rieur: formData.vl_marche_exterieur,
+          V_lo_deux_roues: formData.vl_velo_deuxroues,
+          Sport_ext_rieur: formData.vl_sport_exterieur,
+          Voyage_fr_quent: formData.vl_voyage,
+          Observation_distance: formData.vl_observation_distance,
+          Lecture_de_panneaux: formData.vl_lecture_panneaux,
+          Autres_activit_s_VL: formData.autres_activites_vl,
+
+          // ----- VISION INTERMÉDIAIRE (VI)
+          Ordinateur_fixe: formData.vi_ordinateur_fixe,
+          Ordinateur_portable: formData.vi_ordinateur_portable,
+          Double_cran: formData.vi_double_ecran,
+          cran_prolong: formData.vi_ecran_prolonge,
+          T_l_vision: formData.vi_television,
+          Cuisine: formData.vi_cuisine,
+          Bricolage: formData.vi_bricolage,
+          Activit_manuelle: formData.vi_atelier,
+          Enseignement_pr_sentation: formData.vi_enseignement,
+          Commerce_accueil_client: formData.vi_commerce,
+          Autres_activit_s_VI: formData.autres_activites_vi,
+
+          // ----- VISION DE PRÈS (VP)
+          Lecture_intensive: formData.vp_lecture_intensive,
+          Lecture_occasionnelle: formData.vp_lecture_occasionnelle,
+          T_l_phone_smartphone: formData.vp_smartphone,
+          Tablette: formData.vp_tablette,
+          criture: formData.vp_ecriture,
+          tude_r_vision: formData.vp_etude,
+          Couture_tricot: formData.vp_couture_tricot,
+          Dessin_peinture: formData.vp_dessin_peinture,
+          Activit_s_de_pr_cision: formData.vp_precision,
+          Autres_activit_s_VP: formData.autres_activites_vp,
+
+
+          // === ESSAI DE COMPENSATION ===
+          Type_de_verres_port_s: formData.type_verres_ancien,
+          Ancienne_correction_OD_OG: formData.correction_ancienne,
+          Date_derni_re_facture: formData.date_ancien_equipement,
+          Nouvelle_correction_OD_OG: formData.correction_nouvelle,
+          AV_VL_OD: formData.av_vl_od,
+          AV_VL_OG: formData.av_vl_og,
+          AV_VL_ODG: formData.av_vl_odg,
+          AV_VP_OD: formData.av_vp_od,
+          AV_VP_OG: formData.av_vp_og,
+          AV_VP_ODG: formData.av_vp_odg,
+          Test_0_25: getTriStateValue(
+            formData.test_025_up,
+            formData.test_025_equal,
+            formData.test_025_down
+          ),
+          Test_0_50: getTriStateValue(
+            formData.test_05_up,
+            formData.test_05_equal,
+            formData.test_05_down
+          ),
+          P_niche: formData.peniche_id ? { id: formData.peniche_id } : null,
+
+
+          // === CONTRÔLE ===
+          Opticien_contr_le: formData.controle_opticien
+            ? { id: formData.controle_opticien }
+            : null,
+          Premier_quipement_vis: formData.controle_1er_vis,
+          Premier_quipement_polissage: formData.controle_1er_polissage,
+          Premier_quipement_transition: formData.controle_1er_transition,
+          Opticien_premier_quipement: formData.controle_1er_opticien
+            ? { id: formData.controle_1er_opticien }
+            : null,
+          Deuxi_me_quipement_vis: formData.controle_2eme_vis,
+          Deuxi_me_quipement_polissage: formData.controle_2eme_polissage,
+          Deuxi_me_quipement_transition: formData.controle_2eme_transition,
+          Opticien_deuxi_me_quipement: formData.controle_2eme_opticien
+            ? { id: formData.controle_2eme_opticien }
+            : null,
+          S_curit_monture_m_tal: formData.securite_monture_metal,
+
+          // === LIVRAISON ===
+          Opticien_livraison: formData.livraison_opticien
+            ? { id: formData.livraison_opticien }
+            : null,
+          Acuit_ODG_livraison: formData.acuite_odg,
+          Ressenti_client: formData.ressenti_client,
+          Points_de_vigilance: formData.points_vigilance,
+          Satisfaction: formData.satisfaction_client
         }
       ]
     };
@@ -152,7 +270,7 @@ export default function NouvelleFiche() {
       case 'essai':
         return <EssaiCompensationSection {...props} />;
       case 'controle':
-        return <ControleEquipementSection {...props} />;
+        return <ControleEquipementSection {...props} opticians={opticians} />;
       case 'livraison':
         return <LivraisonSuiviSection {...props} opticians={opticians} />;
       default:

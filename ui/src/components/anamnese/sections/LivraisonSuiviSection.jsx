@@ -3,7 +3,7 @@ import { PackageCheck } from 'lucide-react';
 import SectionHeader from '../SectionHeader';
 import TouchInput from '../TouchInput';
 import TouchTextarea from '../TouchTextarea';
-import TouchCheckbox from '../TouchCheckbox';
+import TouchToggle from "../TouchToggle";
 
 export default function LivraisonSection({ data, onChange, opticians = [] }) {
   const handleChange = (field, value) => {
@@ -60,20 +60,46 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
       </div>
 
       {/* Satisfaction client */}
-      <div className="p-4 rounded-xl border space-y-3">
-        <span className="font-medium">Satisfaction client</span>
-        <div className="flex flex-wrap gap-4">
-          <TouchCheckbox
-            label="Client satisfait"
-            checked={data.client_satisfait}
-            onChange={(v) => handleChange('client_satisfait', v)}
-          />
-          <TouchCheckbox
-            label="Client insatisfait"
-            checked={data.client_insatisfait}
-            onChange={(v) => handleChange('client_insatisfait', v)}
-          />
-        </div>
+      {/* Satisfaction client */}
+      <div
+        className={[
+          "p-4 rounded-xl border transition-colors",
+          data.satisfaction_client === "Satisfait"
+            ? "border-green-500 bg-green-50"
+            : data.satisfaction_client === "Insatisfait"
+              ? "border-red-500 bg-red-50"
+              : "border-gray-200 bg-muted/30",
+        ].join(" ")}
+      >
+        <div className="font-medium mb-3">Satisfaction client</div>
+
+        <TouchToggle
+          options={[
+            { value: "Satisfait", label: "Satisfait" },
+            { value: "Insatisfait", label: "Insatisfait" },
+          ]}
+          value={data.satisfaction_client || ""}
+          onChange={(v) => handleChange("satisfaction_client", v)}
+          className="gap-3"
+          renderOption={(option, isActive) => (
+            <div
+              className={[
+                "px-4 py-2 rounded-xl border cursor-pointer transition-colors text-sm font-medium",
+                option.value === "Satisfait"
+                  ? isActive
+                    ? "bg-green-600 text-white border-green-600"
+                    : "border-green-500 text-green-700"
+                  : option.value === "Insatisfait"
+                    ? isActive
+                      ? "bg-red-600 text-white border-red-600"
+                      : "border-red-500 text-red-700"
+                    : "",
+              ].join(" ")}
+            >
+              {option.label}
+            </div>
+          )}
+        />
       </div>
     </div>
   );
