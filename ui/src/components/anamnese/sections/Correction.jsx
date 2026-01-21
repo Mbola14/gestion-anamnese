@@ -38,8 +38,10 @@ export default function Correction({
 
   // ✅ à CHAQUE rerender, on remet le scroll exactement où il était
   useLayoutEffect(() => {
-    if (scrollerODRef.current) scrollerODRef.current.scrollLeft = scrollLeftRef.current.od;
-    if (scrollerOGRef.current) scrollerOGRef.current.scrollLeft = scrollLeftRef.current.og;
+    if (scrollerODRef.current)
+      scrollerODRef.current.scrollLeft = scrollLeftRef.current.od;
+    if (scrollerOGRef.current)
+      scrollerOGRef.current.scrollLeft = scrollLeftRef.current.og;
   });
 
   const update = (eye, field, value) => {
@@ -68,7 +70,9 @@ export default function Correction({
     // ✅ restore focus après update (sans toucher au scroll ici)
     requestAnimationFrame(() => {
       if (focusInfo?.name && node) {
-        const input = node.querySelector(`[name="${CSS.escape(focusInfo.name)}"]`);
+        const input = node.querySelector(
+          `[name="${CSS.escape(focusInfo.name)}"]`
+        );
         if (input) {
           input.focus({ preventScroll: true });
           if (typeof input.setSelectionRange === "function") {
@@ -81,22 +85,68 @@ export default function Correction({
     });
   };
 
+  const normalizeNumber = (str) => {
+    if (str == null) return null;
+    const s = String(str).trim().replace(",", ".");
+    if (!s) return null;
+    const n = Number(s);
+    if (Number.isNaN(n)) return null;
+    return n;
+  };
+
   const Field = ({ eyeKey, label, field, placeholder = "", inputMode }) => {
     const k = makeKey(eyeKey, field);
+    const rawValue = values?.[eyeKey]?.[field] ?? "";
+
+    // ✅ Cylindre: on AFFICHERA la valeur absolue (le signe - est un préfixe non éditable)
+    const displayValue =
+      field === "cylindre"
+        ? rawValue === ""
+          ? ""
+          : String(Math.abs(Number(rawValue)) || "")
+        : rawValue;
+
     return (
       <div className="w-[84px] shrink-0">
         <label className="block text-xs text-muted-foreground whitespace-nowrap mb-1">
           {label}
         </label>
-        <input
-          name={k}
-          className="w-full rounded-xl border px-2 py-2 bg-background"
-          type="text"
-          inputMode={inputMode}
-          value={values?.[eyeKey]?.[field] ?? ""}
-          placeholder={placeholder}
-          onChange={(e) => update(eyeKey, field, e.target.value)}
-        />
+
+        <div className="relative">
+          {field === "cylindre" && (
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground select-none">
+              −
+            </span>
+          )}
+
+          <input
+            name={k}
+            className={`w-full rounded-xl border px-2 py-2 bg-background ${
+              field === "cylindre" ? "pl-5" : ""
+            }`}
+            type="text"
+            inputMode={inputMode}
+            value={displayValue}
+            placeholder={placeholder}
+            onChange={(e) => {
+              const v = e.target.value;
+
+              if (field === "cylindre") {
+                // ✅ stocke TOUJOURS un nombre négatif
+                if (v.trim() === "") {
+                  update(eyeKey, field, "");
+                  return;
+                }
+                const n = normalizeNumber(v);
+                if (n === null) return; // ignore saisie invalide
+                update(eyeKey, field, -Math.abs(n));
+                return;
+              }
+
+              update(eyeKey, field, v);
+            }}
+          />
+        </div>
       </div>
     );
   };
