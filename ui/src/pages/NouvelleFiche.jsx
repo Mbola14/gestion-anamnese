@@ -119,6 +119,8 @@ export default function NouvelleFiche() {
 
   const createZohoAnamnese = async (contactId) => {
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(" ");
+    console.log("PRINT SPHERE : ----------> ", formData.nouvelle_og_sphere);
+    
 
     const json_data = {
       data: [
@@ -180,6 +182,26 @@ export default function NouvelleFiche() {
           Ancienne_correction_OD_OG: formData.correction_ancienne,
           Date_derni_re_facture: formData.date_ancien_equipement,
           Nouvelle_correction_OD_OG: formData.correction_nouvelle,
+
+
+          Sph_re_OG: formData.nouvelle_og_sphere,
+          Cylindre_OG: formData.nouvelle_og_cylindre,
+          Axe_OG: formData.nouvelle_og_axe,
+          Addition_OG: formData.nouvelle_og_addition,
+          Prisme_1_OG: formData.nouvelle_og_prisme1,
+          Base_1_OG: formData.nouvelle_og_base1,
+          Prisme_2_OG: formData.nouvelle_og_prisme2,
+          Base_2_OG: formData.nouvelle_og_base2,
+          Sph_re_OD: formData.nouvelle_od_sphere,
+          Cylindre_OD: formData.nouvelle_od_cylindre,
+          Axe_OD: formData.nouvelle_od_axe,
+          Addition_OD: formData.nouvelle_od_addition,
+          Prisme_1_OD: formData.nouvelle_od_prisme1,
+          Base_1_OD: formData.nouvelle_od_base1,
+          Prisme_2_OD: formData.nouvelle_od_prisme2,
+          Base_2_OD: formData.nouvelle_od_base2,
+
+
           AV_VL_OD: formData.av_vl_od,
           AV_VL_OG: formData.av_vl_og,
           AV_VL_ODG: formData.av_vl_odg,
