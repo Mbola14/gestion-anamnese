@@ -251,22 +251,28 @@ export default function NouvelleFiche() {
       });
   };
 
-  const handleSave = async () => {
+const handleSave = async () => {
+  try {
     console.log("peniche data au save :", penicheData);
 
-    // ✅ 1) créer/trouver le contact
+    // 1️⃣ créer ou récupérer le contact
     const contactId = await create_contact();
     if (!contactId) {
-      console.error("Impossible de créer/trouver le contact. Vérifie nom + email.");
+      console.error("Impossible de créer/trouver le contact.");
       return;
     }
 
-    // ✅ 2) IMPORTANT : on écrit immédiatement dans le state pour UI
-    setFormData((prev) => ({ ...prev, contact_id: contactId }));
-
-    // ✅ 3) on passe l'id DIRECTEMENT à la création Anamnèse (pas via formData, car setState est async)
+    // 2️⃣ créer l’anamnèse AVEC l’id du contact
     await createZohoAnamnese(contactId);
-  };
+
+    // 3️⃣ fermer le popup + recharger la fiche parente
+    await ZOHO.CRM.UI.Popup.closeReload();
+
+  } catch (e) {
+    console.error("Erreur handleSave :", e);
+  }
+};
+
 
 
   const create_contact = async () => {
