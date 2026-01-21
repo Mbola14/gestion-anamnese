@@ -358,19 +358,29 @@ export default function NouvelleFiche() {
     }
   };
 
-  const goToNextTab = () => {
-    const currentIndex = tabs.findIndex(t => t.id === activeTab);
-    if (currentIndex < tabs.length - 1) {
-      setActiveTab(tabs[currentIndex + 1].id);
-    }
-  };
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
 
-  const goToPrevTab = () => {
-    const currentIndex = tabs.findIndex(t => t.id === activeTab);
-    if (currentIndex > 0) {
-      setActiveTab(tabs[currentIndex - 1].id);
-    }
-  };
+const goToNextTab = () => {
+  const currentIndex = tabs.findIndex(t => t.id === activeTab);
+  if (currentIndex < tabs.length - 1) {
+    setActiveTab(tabs[currentIndex + 1].id);
+    scrollToTop();
+  }
+};
+
+const goToPrevTab = () => {
+  const currentIndex = tabs.findIndex(t => t.id === activeTab);
+  if (currentIndex > 0) {
+    setActiveTab(tabs[currentIndex - 1].id);
+    scrollToTop();
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50">
