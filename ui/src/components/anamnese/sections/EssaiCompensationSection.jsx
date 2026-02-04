@@ -7,6 +7,7 @@ import TouchTextarea from '../TouchTextarea';
 import TouchCheckbox from '../TouchCheckbox';
 import TouchToggle from "../TouchToggle";
 import PenicheSearch from './PenicheSearch';
+import Correction from './Correction';
 
 
 export default function EssaiCompensationSection({ data, onChange }) {
@@ -74,6 +75,13 @@ export default function EssaiCompensationSection({ data, onChange }) {
           label="Correction nouvelle OD / OG"
           value={data.correction_nouvelle}
           onChange={(v) => handleChange('correction_nouvelle', v)}
+        />
+
+        <Correction
+          title="Correction"
+          data={data}
+          onChange={onChange}
+          fieldPrefix="nouvelle"
         />
 
         <DataGrid
