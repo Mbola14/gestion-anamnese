@@ -144,6 +144,7 @@ export default function NouvelleFiche() {
           Ressenti_des_yeux: formData.sentez_vos_yeux,
 
           // === ACTIVITÉS ===
+          Zone_dominante: formData.zone_dominante,
           Conduite_automobile: formData.vl_conduite_auto,
           Conduite_de_nuit: formData.vl_conduite_nuit,
           Marche_ext_rieur: formData.vl_marche_exterieur,
