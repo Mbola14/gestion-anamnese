@@ -114,6 +114,15 @@ export default function NouvelleFiche() {
     return null;
   };
 
+  const mapUnifocalZoneToArray = (zoneObj) => {
+  if (!zoneObj || typeof zoneObj !== "object") return [];
+
+  return Object.entries(zoneObj)
+    .filter(([_, checked]) => checked === true)
+    .map(([zone]) => zone);
+};
+
+
   // ✅ Remplace UNIQUEMENT handleSave + createZohoAnamnese par ces versions.
   // (Ton create_contact peut rester tel quel.)
 
@@ -144,6 +153,7 @@ export default function NouvelleFiche() {
           Ressenti_des_yeux: formData.sentez_vos_yeux,
 
           // === ACTIVITÉS ===
+          Zone_dominante: formData.zone_dominante,
           Conduite_automobile: formData.vl_conduite_auto,
           Conduite_de_nuit: formData.vl_conduite_nuit,
           Marche_ext_rieur: formData.vl_marche_exterieur,
@@ -179,6 +189,7 @@ export default function NouvelleFiche() {
 
           // === ESSAI DE COMPENSATION ===
           Type_de_verres_port_s: formData.type_verres_ancien,
+          Zone_unifocal_type_de_verres_port_s: mapUnifocalZoneToArray(formData.unifocal_zone),
           Ancienne_correction_OD_OG: formData.correction_ancienne,
           Date_derni_re_facture: formData.date_ancien_equipement,
           Nouvelle_correction_OD_OG: formData.correction_nouvelle,
