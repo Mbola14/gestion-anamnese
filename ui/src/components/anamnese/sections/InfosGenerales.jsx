@@ -94,9 +94,9 @@ export default function InfosGenerales({ data, onChange }) {
         <div className="font-medium mb-3">Port de lentilles</div>
         <TouchToggle
           options={[
-            { value: "non", label: "Non" },
-            { value: "occasionnel", label: "Occasionnel" },
-            { value: "regulier", label: "Régulier" },
+            { value: "Non", label: "Non" },
+            { value: "Occasionnel", label: "Occasionnel" },
+            { value: "Régulier", label: "Régulier" },
           ]}
           value={data.port_lentilles || ""}
           onChange={(v) => handleChange("port_lentilles", v)}

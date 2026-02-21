@@ -102,6 +102,7 @@ function buildZohoUpdatePayload(formData) {
         ),
 
         // === ACTIVITÉS ===
+        Zone_dominante: formData.zone_dominante,
         // ----- VL
         Conduite_automobile: !!formData.vl_conduite_auto,
         Conduite_de_nuit: !!formData.vl_conduite_nuit,
@@ -143,6 +144,24 @@ function buildZohoUpdatePayload(formData) {
         Ancienne_correction_OD_OG: formData.correction_ancienne || null,
         Date_derni_re_facture: formData.date_ancien_equipement || null,
         Nouvelle_correction_OD_OG: formData.correction_nouvelle || null,
+
+        // Correction détaillée (pour la section Correction.jsx)
+        Sph_re_OG: formData.nouvelle_og_sphere,
+        Cylindre_OG: formData.nouvelle_og_cylindre,
+        Axe_OG: formData.nouvelle_og_axe,
+        Addition_OG: formData.nouvelle_og_addition,
+        Prisme_1_OG: formData.nouvelle_og_prisme1,
+        Base_1_OG: formData.nouvelle_og_base1,
+        Prisme_2_OG: formData.nouvelle_og_prisme2,
+        Base_2_OG: formData.nouvelle_og_base2,
+        Sph_re_OD: formData.nouvelle_od_sphere,
+        Cylindre_OD: formData.nouvelle_od_cylindre,
+        Axe_OD: formData.nouvelle_od_axe,
+        Addition_OD: formData.nouvelle_od_addition,
+        Prisme_1_OD: formData.nouvelle_od_prisme1,
+        Base_1_OD: formData.nouvelle_od_base1,
+        Prisme_2_OD: formData.nouvelle_od_prisme2,
+        Base_2_OD: formData.nouvelle_od_base2,
 
         AV_VL_OD: formData.av_vl_od ?? null,
         AV_VL_OG: formData.av_vl_og ?? null,
@@ -253,7 +272,7 @@ export default function EditerFiche() {
     return () => {
       try {
         window.ZOHO.embeddedApp.off?.("PageLoad", onPageLoad);
-      } catch {}
+      } catch { }
     };
   }, []);
 
@@ -277,6 +296,8 @@ export default function EditerFiche() {
         });
 
         const rec = resp?.data?.[0] || null;
+        console.log("REC PORT DE LENTILLES : ", rec.Port_de_lentilles);
+
         if (!rec) {
           setFormData({});
           setError("Aucune donnée.");
@@ -286,6 +307,12 @@ export default function EditerFiche() {
         // ✅ hydrate formData depuis le record Zoho
         // NOTE: on garde les clés CRM ET on ajoute les clés "form" dont tes composants ont besoin.
         // Pour les lookups (Contact/Opticiens/Péniche): on met l'id sur les champs *_id utilisés au save.
+
+        // Multi-select Zoho -> objet booléen pour le formulaire
+        const zoneArray = Array.isArray(rec.Zone_unifocal_type_de_verres_port_s)
+          ? rec.Zone_unifocal_type_de_verres_port_s
+          : [];
+
         setFormData((prev) => ({
           ...prev,
 
@@ -311,6 +338,7 @@ export default function EditerFiche() {
           sentez_vos_yeux: rec.Ressenti_des_yeux || "",
 
           // activités (bools)
+          zone_dominante: rec.Zone_dominante || "",
           vl_conduite_auto: !!rec.Conduite_automobile,
           vl_conduite_nuit: !!rec.Conduite_de_nuit,
           vl_marche_exterieur: !!rec.Marche_ext_rieur,
@@ -344,10 +372,36 @@ export default function EditerFiche() {
           vp_precision: !!rec.Activit_s_de_pr_cision,
           autres_activites_vp: rec.Autres_activit_s_VP || "",
 
+          // Essai de compensation
+          unifocal_zone: {
+            VL: zoneArray.includes("VL"),
+            VI: zoneArray.includes("VI"),
+            VP: zoneArray.includes("VP"),
+          },
+
           type_verres_ancien: rec.Type_de_verres_port_s || "",
           correction_ancienne: rec.Ancienne_correction_OD_OG || "",
           date_ancien_equipement: rec.Date_derni_re_facture || "",
           correction_nouvelle: rec.Nouvelle_correction_OD_OG || "",
+
+          // --- Nouvelle correction (Correction.jsx) ---
+          nouvelle_od_sphere: rec?.Sph_re_OD ?? "",
+          nouvelle_od_cylindre: rec?.Cylindre_OD ?? "",
+          nouvelle_od_axe: rec?.Axe_OD ?? "",
+          nouvelle_od_addition: rec?.Addition_OD ?? "",
+          nouvelle_od_prisme1: rec?.Prisme_1_OD ?? "",
+          nouvelle_od_base1: rec?.Base_1_OD ?? "",
+          nouvelle_od_prisme2: rec?.Prisme_2_OD ?? "",
+          nouvelle_od_base2: rec?.Base_2_OD ?? "",
+
+          nouvelle_og_sphere: rec?.Sph_re_OG ?? "",
+          nouvelle_og_cylindre: rec?.Cylindre_OG ?? "",
+          nouvelle_og_axe: rec?.Axe_OG ?? "",
+          nouvelle_og_addition: rec?.Addition_OG ?? "",
+          nouvelle_og_prisme1: rec?.Prisme_1_OG ?? "",
+          nouvelle_og_base1: rec?.Base_1_OG ?? "",
+          nouvelle_og_prisme2: rec?.Prisme_2_OG ?? "",
+          nouvelle_og_base2: rec?.Base_2_OG ?? "",
 
           av_vl_od: rec.AV_VL_OD ?? "",
           av_vl_og: rec.AV_VL_OG ?? "",
