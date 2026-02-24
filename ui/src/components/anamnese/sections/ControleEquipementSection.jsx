@@ -106,32 +106,13 @@ export default function ControleEquipementSection({ data, onChange, opticians = 
 
         {/* Opticien */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Opticien</label>
-          <select
-            className="w-full rounded-xl border px-3 py-3 bg-background"
-            value={data.controle_opticien || ""}
-            onChange={(e) => handleChange("controle_opticien", e.target.value)}
-          >
-            <option value="" disabled>
-              Choisir un opticien…
-            </option>
-            {opticians.map((optician) => (
-              <option key={optician.id} value={optician.id}>
-                {optician.prenom}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-muted-foreground">
-            Liste déroulante avec les prénoms des opticiens de la boutique.
-          </p>
-        </div>
-
         {/* Sécurité monture métal */}
         <TouchCheckbox
-          label="Si monture en métal : pointage ou Loctite effectué dans les charnières de face"
+          label="Attention, si la monture est en métal pointage ou loctite pour les vis"
           checked={data.securite_monture_metal}
           onChange={(v) => handleChange('securite_monture_metal', v)}
         />
+        </div>
 
       </div>
     </div>
