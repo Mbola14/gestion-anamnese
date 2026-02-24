@@ -12,6 +12,6 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "EditerFiche",
+    mainPage: "NouvelleFiche",
     Pages: PAGES,
 };

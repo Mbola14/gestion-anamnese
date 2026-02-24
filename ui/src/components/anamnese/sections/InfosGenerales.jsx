@@ -21,6 +21,7 @@ export default function InfosGenerales({ data, onChange }) {
             { value: "1ère lunette", label: "1ère lunette" },
             { value: "1er progressif", label: "1er progressif" },
             { value: "Renouvellement", label: "Renouvellement" },
+            { value: "Freination Myopie", label: "Freination Myopie" },
           ]}
           value={data.type_equipement || ""}
           onChange={(v) => handleChange("type_equipement", v)}
