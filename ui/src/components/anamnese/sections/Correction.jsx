@@ -67,12 +67,10 @@ export default function Correction({
     // ✅ update sans casser ton mapping (nouvelle_od_* / nouvelle_og_*)
     onChange((prev) => ({ ...prev, [k]: value }));
 
-    // ✅ restore focus après update (sans toucher au scroll ici)
+    // ✅ restore focus après update
     requestAnimationFrame(() => {
       if (focusInfo?.name && node) {
-        const input = node.querySelector(
-          `[name="${CSS.escape(focusInfo.name)}"]`
-        );
+        const input = node.querySelector(`[name="${CSS.escape(focusInfo.name)}"]`);
         if (input) {
           input.focus({ preventScroll: true });
           if (typeof input.setSelectionRange === "function") {
@@ -85,25 +83,43 @@ export default function Correction({
     });
   };
 
-  const normalizeNumber = (str) => {
-    if (str == null) return null;
-    const s = String(str).trim().replace(",", ".");
-    if (!s) return null;
-    const n = Number(s);
-    if (Number.isNaN(n)) return null;
-    return n;
+  // ✅ Autorise la saisie progressive (0, 0., 0.2, etc.) sans passer par Number()
+  const normalizeDecimalText = (raw) => {
+    if (raw == null) return "";
+    let s = String(raw);
+
+    // virer espaces
+    s = s.replace(/\s+/g, "");
+
+    // accepter virgule
+    s = s.replace(",", ".");
+
+    // enlever tout signe tapé (on impose le "-" nous-mêmes)
+    s = s.replace(/[+\-]/g, "");
+
+    // garder uniquement chiffres + points
+    s = s.replace(/[^0-9.]/g, "");
+
+    // ne garder qu'un seul point
+    const firstDot = s.indexOf(".");
+    if (firstDot !== -1) {
+      s = s.slice(0, firstDot + 1) + s.slice(firstDot + 1).replace(/\./g, "");
+    }
+
+    return s; // peut être "", "0", "0.", ".25" (si l'user commence par .)
   };
 
   const Field = ({ eyeKey, label, field, placeholder = "", inputMode }) => {
     const k = makeKey(eyeKey, field);
     const rawValue = values?.[eyeKey]?.[field] ?? "";
 
-    // ✅ Cylindre: on AFFICHERA la valeur absolue (le signe - est un préfixe non éditable)
+    // ✅ Cylindre: afficher la valeur SANS signe (préfixe "−" affiché à gauche)
+    // IMPORTANT: ne pas utiliser Number()/|| "" sinon "0" devient "".
     const displayValue =
       field === "cylindre"
-        ? rawValue === ""
-          ? ""
-          : String(Math.abs(Number(rawValue)) || "")
+        ? String(rawValue).startsWith("-")
+          ? String(rawValue).slice(1)
+          : String(rawValue)
         : rawValue;
 
     return (
@@ -132,14 +148,19 @@ export default function Correction({
               const v = e.target.value;
 
               if (field === "cylindre") {
-                // ✅ stocke TOUJOURS un nombre négatif
-                if (v.trim() === "") {
+                const cleaned = normalizeDecimalText(v);
+
+                // vide => vide
+                if (cleaned === "") {
                   update(eyeKey, field, "");
                   return;
                 }
-                const n = normalizeNumber(v);
-                if (n === null) return; // ignore saisie invalide
-                update(eyeKey, field, -Math.abs(n));
+
+                // si l'utilisateur commence par "." => on préfixe "0."
+                const fixed = cleaned.startsWith(".") ? `0${cleaned}` : cleaned;
+
+                // ✅ stocke TOUJOURS négatif, mais en texte (permet "0", "0.", "0.2")
+                update(eyeKey, field, `-${fixed}`);
                 return;
               }
 

@@ -100,12 +100,6 @@ export default function EssaiCompensationSection({ data, onChange }) {
       <div className="p-4 rounded-xl border bg-white space-y-4">
         <div className="font-semibold">Nouvelle correction</div>
 
-        <TouchInput
-          label="Correction nouvelle OD / OG"
-          value={data.correction_nouvelle}
-          onChange={(v) => handleChange("correction_nouvelle", v)}
-        />
-
         <Correction title="Correction" data={data} onChange={onChange} fieldPrefix="nouvelle" />
 
         <DataGrid
