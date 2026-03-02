@@ -464,7 +464,7 @@ export default function NouvelleFiche() {
             </div>
             <Button
               onClick={handleSave}
-              disabled={createMutation.isPending || !formData.nom}
+              disabled={createMutation.isPending || !formData.nom || !formData.email || !formData.date_naissance}
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-3 flex items-center gap-2 shadow-lg shadow-blue-600/30"
             >
               {createMutation.isPending ? (
