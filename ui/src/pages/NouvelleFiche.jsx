@@ -115,21 +115,64 @@ export default function NouvelleFiche() {
   };
 
   const mapUnifocalZoneToArray = (zoneObj) => {
-  if (!zoneObj || typeof zoneObj !== "object") return [];
+    if (!zoneObj || typeof zoneObj !== "object") return [];
 
-  return Object.entries(zoneObj)
-    .filter(([_, checked]) => checked === true)
-    .map(([zone]) => zone);
-};
+    return Object.entries(zoneObj)
+      .filter(([_, checked]) => checked === true)
+      .map(([zone]) => zone);
+  };
 
 
-  // ✅ Remplace UNIQUEMENT handleSave + createZohoAnamnese par ces versions.
-  // (Ton create_contact peut rester tel quel.)
+  const createZohoPeniche = async (contactId) => {
+    const nomPeniche = String(formData.peniche ?? "").trim();
+    const numeroPeniche = String(formData.n_peniche ?? formData.peniche ?? "").trim();
+    console.log("ID PENICHE ------------->", formData.peniche_id);
+    
+
+    if (!nomPeniche || !numeroPeniche || !contactId) {
+      throw new Error("Champs obligatoires péniche manquants");
+    }
+
+    const payload = {
+      data: [
+        {
+          Deal_Name: nomPeniche,
+          Contact_Name: { id: contactId },
+          N_de_p_niche: { id: formData.peniche_id },
+          Pipeline: "Montures +verres",
+          Stage: "En attente",
+        },
+      ],
+    };
+
+    const response = await ZOHO.CRM.CONNECTION.invoke("zcrm", {
+      url: "https://www.zohoapis.eu/crm/v8/Deals",
+      method: "POST",
+      parameters: payload,
+    });
+
+    const newId = response?.details?.statusMessage?.data?.[0]?.details?.id;
+    console.log("NEW ID -----------------> ", newId);
+    
+
+    if (!newId) {
+      console.error("Erreur création péniche :", response);
+      throw new Error("Impossible de récupérer l'ID de la péniche créée");
+    }
+
+    return newId;
+  };
+
+
 
   const createZohoAnamnese = async (contactId) => {
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(" ");
-    console.log("PRINT SPHERE : ----------> ", formData.nouvelle_og_sphere);
-    
+    let penicheIdToUse = formData.peniche_id || null;
+
+    // Si péniche libre → on crée une péniche
+    if (formData.libre === true) {
+      penicheIdToUse = await createZohoPeniche(contactId);
+    }
 
     const json_data = {
       data: [
@@ -221,8 +264,7 @@ export default function NouvelleFiche() {
           AV_VP_ODG: formData.av_vp_odg,
           Test_0_25: getTriStateValue(formData.test_025_up, formData.test_025_equal, formData.test_025_down),
           Test_0_50: getTriStateValue(formData.test_05_up, formData.test_05_equal, formData.test_05_down),
-          P_niche: formData.peniche_id ? { id: formData.peniche_id } : null,
-
+          P_niche: penicheIdToUse ? { id: penicheIdToUse } : null,
           // === CONTRÔLE ===
           Opticien_contr_le: formData.controle_opticien ? { id: formData.controle_opticien } : null,
           Premier_quipement_vis: formData.controle_1er_vis,
@@ -262,27 +304,27 @@ export default function NouvelleFiche() {
       });
   };
 
-const handleSave = async () => {
-  try {
-    console.log("peniche data au save :", penicheData);
+  const handleSave = async () => {
+    try {
+      console.log("peniche data au save :", penicheData);
 
-    // 1️⃣ créer ou récupérer le contact
-    const contactId = await create_contact();
-    if (!contactId) {
-      console.error("Impossible de créer/trouver le contact.");
-      return;
+      // 1️⃣ créer ou récupérer le contact
+      const contactId = await create_contact();
+      if (!contactId) {
+        console.error("Impossible de créer/trouver le contact.");
+        return;
+      }
+
+      // 2️⃣ créer l’anamnèse AVEC l’id du contact
+      await createZohoAnamnese(contactId);
+
+      // 3️⃣ fermer le popup + recharger la fiche parente
+      await ZOHO.CRM.UI.Popup.closeReload();
+
+    } catch (e) {
+      console.error("Erreur handleSave :", e);
     }
-
-    // 2️⃣ créer l’anamnèse AVEC l’id du contact
-    await createZohoAnamnese(contactId);
-
-    // 3️⃣ fermer le popup + recharger la fiche parente
-    await ZOHO.CRM.UI.Popup.closeReload();
-
-  } catch (e) {
-    console.error("Erreur handleSave :", e);
-  }
-};
+  };
 
 
 
@@ -375,28 +417,28 @@ const handleSave = async () => {
     }
   };
 
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-};
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
-const goToNextTab = () => {
-  const currentIndex = tabs.findIndex(t => t.id === activeTab);
-  if (currentIndex < tabs.length - 1) {
-    setActiveTab(tabs[currentIndex + 1].id);
-    scrollToTop();
-  }
-};
+  const goToNextTab = () => {
+    const currentIndex = tabs.findIndex(t => t.id === activeTab);
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1].id);
+      scrollToTop();
+    }
+  };
 
-const goToPrevTab = () => {
-  const currentIndex = tabs.findIndex(t => t.id === activeTab);
-  if (currentIndex > 0) {
-    setActiveTab(tabs[currentIndex - 1].id);
-    scrollToTop();
-  }
-};
+  const goToPrevTab = () => {
+    const currentIndex = tabs.findIndex(t => t.id === activeTab);
+    if (currentIndex > 0) {
+      setActiveTab(tabs[currentIndex - 1].id);
+      scrollToTop();
+    }
+  };
 
 
   return (

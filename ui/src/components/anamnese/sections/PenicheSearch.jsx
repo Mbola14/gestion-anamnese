@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import TouchInput from "../TouchInput";
 
 export default function PenicheSearch({ data, onChange }) {
-  // ✅ IMPORTANT : update fonctionnelle pour éviter d’écraser des champs
   const setField = (field, value) => {
     onChange((prev) => ({ ...prev, [field]: value }));
   };
@@ -12,13 +11,13 @@ export default function PenicheSearch({ data, onChange }) {
 
   const debounceRef = useRef(null);
   const lastQueryRef = useRef("");
-  const selectedRef = useRef(null); // { id, label, stage }
+  const selectedRef = useRef(null);
 
   useEffect(() => {
-    const q = (data.peniche || "").trim();
+    // ✅ Sécurise le trim même si data.peniche est un nombre
+    const q = String(data.peniche ?? "").trim();
 
-    // ✅ si déjà sélectionné et texte identique => pas de recherche
-    if (selectedRef.current && q === (selectedRef.current.label || "").trim()) {
+    if (selectedRef.current && q === String(selectedRef.current.label ?? "").trim()) {
       setResults([]);
       setIsSearching(false);
       return;
@@ -64,12 +63,15 @@ export default function PenicheSearch({ data, onChange }) {
           }
 
           const arr = Array.isArray(parsed?.data) ? parsed.data : [];
+
           const mapped = arr
             .filter((p) => p?.id)
             .map((p) => ({
               id: p.id,
-              label: p.Deal_Name || "Péniche",
-              stage: p.Stage || "",
+              // ✅ Deal_Name peut être "Péniche N° 102" OU 102 (number) -> on force string
+              label: String(p.Deal_Name ?? "Péniche"),
+              stage: String(p.Stage ?? ""),
+              libre: p.Libre === true, // absent => false
             }));
 
           setResults(mapped);
@@ -97,17 +99,16 @@ export default function PenicheSearch({ data, onChange }) {
 
       <TouchInput
         label="Péniche"
-        value={data.peniche || ""}
-        onChange={(v) => setField("peniche", v)}
+        value={String(data.peniche ?? "")} // ✅ toujours string
+        onChange={(v) => setField("peniche", String(v ?? ""))} // ✅ toujours string
         placeholder="Tapez au moins 2 caractères…"
       />
 
-      {/* ✅ Sélection unique affichée */}
       {selectedId && (data.peniche || selectedLabel) && (
         <div className="rounded-xl border p-3 bg-muted/20 flex items-start justify-between gap-3">
           <div>
             <div className="text-xs text-muted-foreground">Péniche sélectionnée</div>
-            <div className="font-medium">{data.peniche || selectedLabel}</div>
+            <div className="font-medium">{String(data.peniche || selectedLabel)}</div>
             <div className="text-xs text-muted-foreground">ID : {selectedId}</div>
           </div>
 
@@ -117,7 +118,6 @@ export default function PenicheSearch({ data, onChange }) {
             onClick={() => {
               selectedRef.current = null;
               setField("peniche_id", "");
-              // on garde le texte pour permettre correction rapide (ex: 446 -> 449)
               setResults([]);
             }}
           >
@@ -144,21 +144,27 @@ export default function PenicheSearch({ data, onChange }) {
                 onClick={() => {
                   selectedRef.current = r;
 
-                  // ✅ UN SEUL UPDATE (pas 2 appels) + update fonctionnelle
                   onChange((prev) => ({
                     ...prev,
                     peniche_id: r.id,
-                    peniche: r.label,
+                    peniche: String(r.label ?? ""), // ✅ force string
+                    libre: r.libre, // ✅ pas r.Libre
                   }));
 
-                  setResults([]); // sélection unique -> on ferme
+                  setResults([]);
                 }}
               >
                 <div className="font-medium">{r.label}</div>
+
                 {r.stage && (
                   <div className="text-xs text-muted-foreground">Statut : {r.stage}</div>
                 )}
+
                 <div className="text-xs text-muted-foreground">ID : {r.id}</div>
+
+                <div className="text-xs text-muted-foreground">
+                  Libre : {r.libre ? "Oui" : "Non"}
+                </div>
               </button>
             );
           })}
@@ -166,11 +172,11 @@ export default function PenicheSearch({ data, onChange }) {
       )}
 
       {!isSearching &&
-        (data.peniche || "").trim().length >= 2 &&
+        String(data.peniche ?? "").trim().length >= 2 &&
         results.length === 0 &&
         !(
           selectedRef.current &&
-          (data.peniche || "").trim() === (selectedRef.current.label || "").trim()
+          String(data.peniche ?? "").trim() === String(selectedRef.current.label ?? "").trim()
         ) && <div className="text-xs text-muted-foreground">Aucun résultat.</div>}
     </div>
   );
