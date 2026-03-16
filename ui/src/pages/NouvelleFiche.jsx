@@ -127,7 +127,7 @@ export default function NouvelleFiche() {
     const nomPeniche = String(formData.peniche ?? "").trim();
     const numeroPeniche = String(formData.n_peniche ?? formData.peniche ?? "").trim();
     console.log("ID PENICHE ------------->", formData.peniche_id);
-    
+
 
     if (!nomPeniche || !numeroPeniche || !contactId) {
       throw new Error("Champs obligatoires péniche manquants");
@@ -153,7 +153,7 @@ export default function NouvelleFiche() {
 
     const newId = response?.details?.statusMessage?.data?.[0]?.details?.id;
     console.log("NEW ID -----------------> ", newId);
-    
+
 
     if (!newId) {
       console.error("Erreur création péniche :", response);
@@ -286,6 +286,22 @@ export default function NouvelleFiche() {
         },
       ],
     };
+
+    console.log("json data : ", json_data);
+    
+    const func_name = "send_mail_json_fa";
+    const req_data = {
+      arguments: JSON.stringify({ json : JSON.stringify(json_data) }),
+    };
+    console.log("REQ DATA : ", req_data);
+
+    ZOHO.CRM.FUNCTIONS.execute(func_name, req_data)
+      .then((resp) => {
+        console.log("RESPONSE ENVOI MAIL : ", resp);
+      })
+      .catch((e) => {
+        console.error("Erreur send_mail_json_fa :", e);
+      });
 
     console.log("ID CONTACT A ASSOCIER (UTILISÉ) :", contactId);
 
