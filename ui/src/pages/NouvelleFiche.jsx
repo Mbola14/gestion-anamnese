@@ -167,8 +167,8 @@ export default function NouvelleFiche() {
 
   const createZohoAnamnese = async (contactId) => {
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(" ");
+    
     let penicheIdToUse = formData.peniche_id || null;
-
     // Si péniche libre → on crée une péniche
     if (formData.libre === true) {
       penicheIdToUse = await createZohoPeniche(contactId);
