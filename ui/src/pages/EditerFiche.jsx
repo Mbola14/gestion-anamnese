@@ -62,160 +62,49 @@ function zoneToMultiSelectArray(zoneObj) {
     .map(([k]) => k);
 }
 
-// ⚠️ IMPORTANT: ici on mappe formData -> payload Zoho (comme NouvelleFiche.jsx)
-function buildZohoUpdatePayload(formData) {
-  const fullName = [formData.prenom, formData.nom].filter(Boolean).join(" ");
+const createZohoPeniche = async (formData) => {
+  const nomPeniche = String(formData.peniche ?? "").trim();
+  const numeroPeniche = String(formData.n_peniche ?? formData.peniche ?? "").trim();
+  console.log("ID PENICHE ------------->", formData.peniche_id);
+  console.log("NOM PENICHE ------------->", formData.peniche);
+  console.log("ID CONTACT ------------->", formData.contact_id);
 
-  return {
+if (!formData.peniche_id) {
+  return null; // pas de péniche sélectionnée, on ne crée rien
+}
+  if (!nomPeniche || !numeroPeniche || !formData.contact_id) {
+    throw new Error("Champs obligatoires péniche manquants");
+  }
+
+  const payload = {
     data: [
       {
-        // === IDENTIFICATION ===
-        Contact: formData.contact_id ? { id: formData.contact_id } : null,
-        Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
-        Email: formData.email || null,
-        Nom: formData.nom || null,
-        Pr_nom: formData.prenom || null,
-        Date_de_naissance: formData.date_naissance || null,
-        Nouveau_client:
-          typeof formData.nouveau_client === "boolean"
-            ? formData.nouveau_client
-            : null,
-        Date_de_visite: formData.date_visite || null,
-        Opticien_visite: formData.opticien_visite
-          ? { id: formData.opticien_visite }
-          : null,
-
-        // === INFORMATIONS GÉNÉRALES ===
-        Type_d_quipement: formData.type_equipement || null,
-        carts_pupillaires_OD_OG: formData.ecarts_pupillaires || null,
-        Motif_de_la_visite_boutique: formData.motif_visite_boutique || null,
-        Motif_Qualissime: !!formData.autre_raison_qualissime,
-        Motif_Perte_de_lunettes: !!formData.autre_raison_perte_lunettes,
-        Sant_oculaire_PIO_FO: formData.sante_oculaire || null,
-        Orthoptie_exercices_r_alis_s: formData.orthoptie || null,
-        Port_de_lentilles: formData.port_lentilles || null,
-        Ressenti_des_yeux: formData.sentez_vos_yeux || null,
-
-        // ⚠️ exemple multi-select (si tu l’utilises)
-        Zone_unifocal_type_de_verres_port_s: zoneToMultiSelectArray(
-          formData.unifocal_zone
-        ),
-
-        // === ACTIVITÉS ===
-        Zone_dominante: formData.zone_dominante,
-        // ----- VL
-        Conduite_automobile: !!formData.vl_conduite_auto,
-        Conduite_de_nuit: !!formData.vl_conduite_nuit,
-        Marche_ext_rieur: !!formData.vl_marche_exterieur,
-        V_lo_deux_roues: !!formData.vl_velo_deuxroues,
-        Sport_ext_rieur: !!formData.vl_sport_exterieur,
-        Voyage_fr_quent: !!formData.vl_voyage,
-        Observation_distance: !!formData.vl_observation_distance,
-        Lecture_de_panneaux: !!formData.vl_lecture_panneaux,
-        Autres_activit_s_VL: formData.autres_activites_vl || null,
-
-        // ----- VI
-        Ordinateur_fixe: !!formData.vi_ordinateur_fixe,
-        Ordinateur_portable: !!formData.vi_ordinateur_portable,
-        Double_cran: !!formData.vi_double_ecran,
-        cran_prolong: !!formData.vi_ecran_prolonge,
-        T_l_vision: !!formData.vi_television,
-        Cuisine: !!formData.vi_cuisine,
-        Bricolage: !!formData.vi_bricolage,
-        Activit_manuelle: !!formData.vi_atelier,
-        Enseignement_pr_sentation: !!formData.vi_enseignement,
-        Commerce_accueil_client: !!formData.vi_commerce,
-        Autres_activit_s_VI: formData.autres_activites_vi || null,
-
-        // ----- VP
-        Lecture_intensive: !!formData.vp_lecture_intensive,
-        Lecture_occasionnelle: !!formData.vp_lecture_occasionnelle,
-        T_l_phone_smartphone: !!formData.vp_smartphone,
-        Tablette: !!formData.vp_tablette,
-        criture: !!formData.vp_ecriture,
-        tude_r_vision: !!formData.vp_etude,
-        Couture_tricot: !!formData.vp_couture_tricot,
-        Dessin_peinture: !!formData.vp_dessin_peinture,
-        Activit_s_de_pr_cision: !!formData.vp_precision,
-        Autres_activit_s_VP: formData.autres_activites_vp || null,
-
-        // === ESSAI ===
-        Type_de_verres_port_s: formData.type_verres_ancien || null,
-        Ancienne_correction_OD_OG: formData.correction_ancienne || null,
-        Date_derni_re_facture: formData.date_ancien_equipement || null,
-        Nouvelle_correction_OD_OG: formData.correction_nouvelle || null,
-
-        // Correction détaillée (pour la section Correction.jsx)
-        Sph_re_OG: formData.nouvelle_og_sphere,
-        Cylindre_OG: formData.nouvelle_og_cylindre,
-        Axe_OG: formData.nouvelle_og_axe,
-        Addition_OG: formData.nouvelle_og_addition,
-        Prisme_1_OG: formData.nouvelle_og_prisme1,
-        Base_1_OG: formData.nouvelle_og_base1,
-        Prisme_2_OG: formData.nouvelle_og_prisme2,
-        Base_2_OG: formData.nouvelle_og_base2,
-        Sph_re_OD: formData.nouvelle_od_sphere,
-        Cylindre_OD: formData.nouvelle_od_cylindre,
-        Axe_OD: formData.nouvelle_od_axe,
-        Addition_OD: formData.nouvelle_od_addition,
-        Prisme_1_OD: formData.nouvelle_od_prisme1,
-        Base_1_OD: formData.nouvelle_od_base1,
-        Prisme_2_OD: formData.nouvelle_od_prisme2,
-        Base_2_OD: formData.nouvelle_od_base2,
-
-        AV_VL_OD: formData.av_vl_od ?? null,
-        AV_VL_OG: formData.av_vl_og ?? null,
-        AV_VL_ODG: formData.av_vl_odg ?? null,
-        AV_VP_OD: formData.av_vp_od ?? null,
-        AV_VP_OG: formData.av_vp_og ?? null,
-        AV_VP_ODG: formData.av_vp_odg ?? null,
-
-        Test_0_25: getTriStateValue(
-          formData.test_025_up,
-          formData.test_025_equal,
-          formData.test_025_down
-        ),
-        Test_0_50: getTriStateValue(
-          formData.test_05_up,
-          formData.test_05_equal,
-          formData.test_05_down
-        ),
-
-        P_niche: formData.peniche_id ? { id: formData.peniche_id } : null,
-
-        // === CONTRÔLE ===
-        Opticien_contr_le: formData.controle_opticien
-          ? { id: formData.controle_opticien }
-          : null,
-
-        Premier_quipement_vis: !!formData.controle_1er_vis,
-        Premier_quipement_polissage: !!formData.controle_1er_polissage,
-        Premier_quipement_transition: !!formData.controle_1er_transition,
-        Opticien_premier_quipement: formData.controle_1er_opticien
-          ? { id: formData.controle_1er_opticien }
-          : null,
-
-        Deuxi_me_quipement_vis: !!formData.controle_2eme_vis,
-        Deuxi_me_quipement_polissage: !!formData.controle_2eme_polissage,
-        Deuxi_me_quipement_transition: !!formData.controle_2eme_transition,
-        Opticien_deuxi_me_quipement: formData.controle_2eme_opticien
-          ? { id: formData.controle_2eme_opticien }
-          : null,
-
-        S_curit_monture_m_tal: !!formData.securite_monture_metal,
-
-        // === LIVRAISON ===
-        Opticien_livraison: formData.livraison_opticien
-          ? { id: formData.livraison_opticien }
-          : null,
-        Acuit_ODG_livraison: formData.acuite_odg ?? null,
-        Ressenti_client: formData.ressenti_client || null,
-        Points_de_vigilance: formData.points_vigilance || null,
-        Satisfaction: formData.satisfaction_client || null,
+        Deal_Name: nomPeniche,
+        Contact_Name: { id: formData.contact_id },
+        N_de_p_niche: { id: formData.peniche_id },
+        Pipeline: "Montures +verres",
+        Stage: "En attente",
       },
     ],
   };
-}
+
+  const response = await ZOHO.CRM.CONNECTION.invoke("zcrm", {
+    url: "https://www.zohoapis.eu/crm/v8/Deals",
+    method: "POST",
+    parameters: payload,
+  });
+
+  const newId = response?.details?.statusMessage?.data?.[0]?.details?.id;
+  console.log("NEW ID -----------------> ", newId);
+
+
+  if (!newId) {
+    console.error("Erreur création péniche :", response);
+    throw new Error("Impossible de récupérer l'ID de la péniche créée");
+  }
+
+  return newId;
+};
 
 export default function EditerFiche() {
   const navigate = useNavigate();
@@ -471,8 +360,171 @@ export default function EditerFiche() {
     try {
       setIsSaving(true);
       setError(null);
+      const get_contact = await window.ZOHO.CRM.API.getRecord({
+        Entity: "Contacts",
+        RecordID: formData.contact_id,
+      });
 
-      const payload = buildZohoUpdatePayload(formData);
+      const contact_record = get_contact?.data?.[0] || null;
+      console.log("PRENOM DANS LE CONTACT RECORD AVANT UPDATE : ", contact_record.First_Name);
+      let penicheIdToUse = formData.peniche_id || null;
+      // Si péniche libre → on crée une péniche
+      if (formData.libre === true) {
+        penicheIdToUse = await createZohoPeniche(formData);
+      };
+      console.log("ID PENICHE À UTILISER POUR UPDATE : ", penicheIdToUse);
+      const fullName = [contact_record.First_Name, contact_record.Last_Name].filter(Boolean).join(" ");
+
+      const payload = {
+        data: [
+          {
+            // === IDENTIFICATION ===
+            Contact: formData.contact_id ? { id: formData.contact_id } : null,
+            Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
+            Email: formData.email || null,
+            Nom: formData.nom || null,
+            Pr_nom: formData.prenom || null,
+            Date_de_naissance: formData.date_naissance || null,
+            Nouveau_client:
+              typeof formData.nouveau_client === "boolean"
+                ? formData.nouveau_client
+                : null,
+            Date_de_visite: formData.date_visite || null,
+            Opticien_visite: formData.opticien_visite
+              ? { id: formData.opticien_visite }
+              : null,
+
+            // === INFORMATIONS GÉNÉRALES ===
+            Type_d_quipement: formData.type_equipement || null,
+            carts_pupillaires_OD_OG: formData.ecarts_pupillaires || null,
+            Motif_de_la_visite_boutique: formData.motif_visite_boutique || null,
+            Motif_Qualissime: !!formData.autre_raison_qualissime,
+            Motif_Perte_de_lunettes: !!formData.autre_raison_perte_lunettes,
+            Sant_oculaire_PIO_FO: formData.sante_oculaire || null,
+            Orthoptie_exercices_r_alis_s: formData.orthoptie || null,
+            Port_de_lentilles: formData.port_lentilles || null,
+            Ressenti_des_yeux: formData.sentez_vos_yeux || null,
+
+            // ⚠️ exemple multi-select (si tu l’utilises)
+            Zone_unifocal_type_de_verres_port_s: zoneToMultiSelectArray(
+              formData.unifocal_zone
+            ),
+
+            // === ACTIVITÉS ===
+            Zone_dominante: formData.zone_dominante,
+            // ----- VL
+            Conduite_automobile: !!formData.vl_conduite_auto,
+            Conduite_de_nuit: !!formData.vl_conduite_nuit,
+            Marche_ext_rieur: !!formData.vl_marche_exterieur,
+            V_lo_deux_roues: !!formData.vl_velo_deuxroues,
+            Sport_ext_rieur: !!formData.vl_sport_exterieur,
+            Voyage_fr_quent: !!formData.vl_voyage,
+            Observation_distance: !!formData.vl_observation_distance,
+            Lecture_de_panneaux: !!formData.vl_lecture_panneaux,
+            Autres_activit_s_VL: formData.autres_activites_vl || null,
+
+            // ----- VI
+            Ordinateur_fixe: !!formData.vi_ordinateur_fixe,
+            Ordinateur_portable: !!formData.vi_ordinateur_portable,
+            Double_cran: !!formData.vi_double_ecran,
+            cran_prolong: !!formData.vi_ecran_prolonge,
+            T_l_vision: !!formData.vi_television,
+            Cuisine: !!formData.vi_cuisine,
+            Bricolage: !!formData.vi_bricolage,
+            Activit_manuelle: !!formData.vi_atelier,
+            Enseignement_pr_sentation: !!formData.vi_enseignement,
+            Commerce_accueil_client: !!formData.vi_commerce,
+            Autres_activit_s_VI: formData.autres_activites_vi || null,
+
+            // ----- VP
+            Lecture_intensive: !!formData.vp_lecture_intensive,
+            Lecture_occasionnelle: !!formData.vp_lecture_occasionnelle,
+            T_l_phone_smartphone: !!formData.vp_smartphone,
+            Tablette: !!formData.vp_tablette,
+            criture: !!formData.vp_ecriture,
+            tude_r_vision: !!formData.vp_etude,
+            Couture_tricot: !!formData.vp_couture_tricot,
+            Dessin_peinture: !!formData.vp_dessin_peinture,
+            Activit_s_de_pr_cision: !!formData.vp_precision,
+            Autres_activit_s_VP: formData.autres_activites_vp || null,
+
+            // === ESSAI ===
+            Type_de_verres_port_s: formData.type_verres_ancien || null,
+            Ancienne_correction_OD_OG: formData.correction_ancienne || null,
+            Date_derni_re_facture: formData.date_ancien_equipement || null,
+            Nouvelle_correction_OD_OG: formData.correction_nouvelle || null,
+
+            // Correction détaillée (pour la section Correction.jsx)
+            Sph_re_OG: formData.nouvelle_og_sphere,
+            Cylindre_OG: formData.nouvelle_og_cylindre,
+            Axe_OG: formData.nouvelle_og_axe,
+            Addition_OG: formData.nouvelle_og_addition,
+            Prisme_1_OG: formData.nouvelle_og_prisme1,
+            Base_1_OG: formData.nouvelle_og_base1,
+            Prisme_2_OG: formData.nouvelle_og_prisme2,
+            Base_2_OG: formData.nouvelle_og_base2,
+            Sph_re_OD: formData.nouvelle_od_sphere,
+            Cylindre_OD: formData.nouvelle_od_cylindre,
+            Axe_OD: formData.nouvelle_od_axe,
+            Addition_OD: formData.nouvelle_od_addition,
+            Prisme_1_OD: formData.nouvelle_od_prisme1,
+            Base_1_OD: formData.nouvelle_od_base1,
+            Prisme_2_OD: formData.nouvelle_od_prisme2,
+            Base_2_OD: formData.nouvelle_od_base2,
+
+            AV_VL_OD: formData.av_vl_od ?? null,
+            AV_VL_OG: formData.av_vl_og ?? null,
+            AV_VL_ODG: formData.av_vl_odg ?? null,
+            AV_VP_OD: formData.av_vp_od ?? null,
+            AV_VP_OG: formData.av_vp_og ?? null,
+            AV_VP_ODG: formData.av_vp_odg ?? null,
+
+            Test_0_25: getTriStateValue(
+              formData.test_025_up,
+              formData.test_025_equal,
+              formData.test_025_down
+            ),
+            Test_0_50: getTriStateValue(
+              formData.test_05_up,
+              formData.test_05_equal,
+              formData.test_05_down
+            ),
+
+            P_niche: penicheIdToUse ? { id: penicheIdToUse } : null,
+
+            // === CONTRÔLE ===
+            Opticien_contr_le: formData.controle_opticien
+              ? { id: formData.controle_opticien }
+              : null,
+
+            Premier_quipement_vis: !!formData.controle_1er_vis,
+            Premier_quipement_polissage: !!formData.controle_1er_polissage,
+            Premier_quipement_transition: !!formData.controle_1er_transition,
+            Opticien_premier_quipement: formData.controle_1er_opticien
+              ? { id: formData.controle_1er_opticien }
+              : null,
+
+            Deuxi_me_quipement_vis: !!formData.controle_2eme_vis,
+            Deuxi_me_quipement_polissage: !!formData.controle_2eme_polissage,
+            Deuxi_me_quipement_transition: !!formData.controle_2eme_transition,
+            Opticien_deuxi_me_quipement: formData.controle_2eme_opticien
+              ? { id: formData.controle_2eme_opticien }
+              : null,
+
+            S_curit_monture_m_tal: !!formData.securite_monture_metal,
+
+            // === LIVRAISON ===
+            Opticien_livraison: formData.livraison_opticien
+              ? { id: formData.livraison_opticien }
+              : null,
+            Acuit_ODG_livraison: formData.acuite_odg ?? null,
+            Ressenti_client: formData.ressenti_client || null,
+            Points_de_vigilance: formData.points_vigilance || null,
+            Satisfaction: formData.satisfaction_client || null,
+          },
+        ],
+      };
+      console.log("PAYLOAD CONSTRUIT POUR L'UPDATE : ", payload);
 
       const resp = await window.ZOHO.CRM.CONNECTION.invoke("zcrm", {
         url: `https://www.zohoapis.eu/crm/v8/Anamneses/${recordId}`,
