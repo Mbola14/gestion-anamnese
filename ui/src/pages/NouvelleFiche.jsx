@@ -114,6 +114,13 @@ export default function NouvelleFiche() {
     return null;
   };
 
+  const deletePlusSign = (value) => {
+    if (typeof value === "string") {
+      return value.replace(/\+/g, "").trim();
+    }
+    return value;
+  };
+
   const mapUnifocalZoneToArray = (zoneObj) => {
     if (!zoneObj || typeof zoneObj !== "object") return [];
 
@@ -167,7 +174,7 @@ export default function NouvelleFiche() {
 
   const createZohoAnamnese = async (contactId) => {
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(" ");
-    
+
     let penicheIdToUse = formData.peniche_id || null;
     // Si péniche libre → on crée une péniche
     if (formData.libre === true) {
@@ -238,30 +245,30 @@ export default function NouvelleFiche() {
           Nouvelle_correction_OD_OG: formData.correction_nouvelle,
 
 
-          Sph_re_OG: formData.nouvelle_og_sphere,
-          Cylindre_OG: formData.nouvelle_og_cylindre,
-          Axe_OG: formData.nouvelle_og_axe,
-          Addition_OG: formData.nouvelle_og_addition,
-          Prisme_1_OG: formData.nouvelle_og_prisme1,
-          Base_1_OG: formData.nouvelle_og_base1,
-          Prisme_2_OG: formData.nouvelle_og_prisme2,
-          Base_2_OG: formData.nouvelle_og_base2,
-          Sph_re_OD: formData.nouvelle_od_sphere,
-          Cylindre_OD: formData.nouvelle_od_cylindre,
-          Axe_OD: formData.nouvelle_od_axe,
-          Addition_OD: formData.nouvelle_od_addition,
-          Prisme_1_OD: formData.nouvelle_od_prisme1,
-          Base_1_OD: formData.nouvelle_od_base1,
-          Prisme_2_OD: formData.nouvelle_od_prisme2,
-          Base_2_OD: formData.nouvelle_od_base2,
+          Sph_re_OG: deletePlusSign(formData.nouvelle_og_sphere),
+          Cylindre_OG: deletePlusSign(formData.nouvelle_og_cylindre),
+          Axe_OG: deletePlusSign(formData.nouvelle_og_axe),
+          Addition_OG: deletePlusSign(formData.nouvelle_og_addition),
+          Prisme_1_OG: deletePlusSign(formData.nouvelle_og_prisme1),
+          Base_1_OG: deletePlusSign(formData.nouvelle_og_base1),
+          Prisme_2_OG: deletePlusSign(formData.nouvelle_og_prisme2),
+          Base_2_OG: deletePlusSign(formData.nouvelle_og_base2),
+          Sph_re_OD: deletePlusSign(formData.nouvelle_od_sphere),
+          Cylindre_OD: deletePlusSign(formData.nouvelle_od_cylindre),
+          Axe_OD: deletePlusSign(formData.nouvelle_od_axe),
+          Addition_OD: deletePlusSign(formData.nouvelle_od_addition),
+          Prisme_1_OD: deletePlusSign(formData.nouvelle_od_prisme1),
+          Base_1_OD: deletePlusSign(formData.nouvelle_od_base1),
+          Prisme_2_OD: deletePlusSign(formData.nouvelle_od_prisme2),
+          Base_2_OD: deletePlusSign(formData.nouvelle_od_base2),
 
 
-          AV_VL_OD: formData.av_vl_od,
-          AV_VL_OG: formData.av_vl_og,
-          AV_VL_ODG: formData.av_vl_odg,
-          AV_VP_OD: formData.av_vp_od,
-          AV_VP_OG: formData.av_vp_og,
-          AV_VP_ODG: formData.av_vp_odg,
+          AV_VL_OD: deletePlusSign(formData.av_vl_od),
+          AV_VL_OG: deletePlusSign(formData.av_vl_og),
+          AV_VL_ODG: deletePlusSign(formData.av_vl_odg),
+          AV_VP_OD: deletePlusSign(formData.av_vp_od),
+          AV_VP_OG: deletePlusSign(formData.av_vp_og),
+          AV_VP_ODG: deletePlusSign(formData.av_vp_odg),
           Test_0_25: getTriStateValue(formData.test_025_up, formData.test_025_equal, formData.test_025_down),
           Test_0_50: getTriStateValue(formData.test_05_up, formData.test_05_equal, formData.test_05_down),
           P_niche: penicheIdToUse ? { id: penicheIdToUse } : null,
@@ -287,11 +294,9 @@ export default function NouvelleFiche() {
       ],
     };
 
-    console.log("json data : ", json_data);
-    
     const func_name = "send_mail_json_fa";
     const req_data = {
-      arguments: JSON.stringify({ json : JSON.stringify(json_data) }),
+      arguments: JSON.stringify({ json: JSON.stringify(json_data) }),
     };
     console.log("REQ DATA : ", req_data);
 
@@ -334,7 +339,7 @@ export default function NouvelleFiche() {
       // 2️⃣ créer l’anamnèse AVEC l’id du contact
       await createZohoAnamnese(contactId);
 
-      // 3️⃣ fermer le popup + recharger la fiche parente
+      // 3️⃣ fermer le popup + recharger/refresh la fiche parente
       await ZOHO.CRM.UI.Popup.closeReload();
 
     } catch (e) {
