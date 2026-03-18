@@ -114,12 +114,41 @@ export default function NouvelleFiche() {
     return null;
   };
 
-  const deletePlusSign = (value) => {
-    if (typeof value === "string") {
-      return value.replace(/\+/g, "").trim();
-    }
-    return value;
-  };
+const deletePlusSign = (value) => {
+  if (typeof value !== "string") return value;
+
+  let s = value.trim();
+
+  // enlève tous les +
+  s = s.replace(/\+/g, "");
+
+  // compte les virgules et points AVANT remplacement
+  const commaCount = (s.match(/,/g) || []).length;
+  const dotCount = (s.match(/\./g) || []).length;
+
+  if (commaCount + dotCount > 1) {
+    return null;
+  }
+
+  // remplace , par .
+  s = s.replace(/,/g, ".");
+
+  // enlève les lettres
+  s = s.replace(/[a-zA-Z]/g, "");
+
+  // gestion du signe -
+  const minusCount = (s.match(/-/g) || []).length;
+
+  // enlève tous les -
+  s = s.replace(/-/g, "");
+
+  // si au moins un -, on remet un seul au début
+  if (minusCount > 0) {
+    s = "-" + s;
+  }
+
+  return s;
+};
 
   const mapUnifocalZoneToArray = (zoneObj) => {
     if (!zoneObj || typeof zoneObj !== "object") return [];
@@ -182,7 +211,7 @@ export default function NouvelleFiche() {
     }
 
     const json_data = {
-      data: [
+          data: [
         {
           // === IDENTIFICATION ===
           Contact: contactId ? { id: contactId } : null, // ✅ IMPORTANT
