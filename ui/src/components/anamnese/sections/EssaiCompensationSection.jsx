@@ -7,6 +7,7 @@ import TouchCheckbox from "../TouchCheckbox";
 import TouchToggle from "../TouchToggle";
 import PenicheSearch from "./PenicheSearch";
 import Correction from "./Correction";
+import TouchTextarea from "../TouchTextarea";
 
 export default function EssaiCompensationSection({ data, onChange }) {
   const handleChange = (field, value) => {
@@ -88,11 +89,18 @@ export default function EssaiCompensationSection({ data, onChange }) {
           </div>
         </div>
 
-        <TouchInput
+        {/* <TouchInput
           label="Correction ancienne OD / OG"
           value={data.correction_ancienne}
           onChange={(v) => handleChange("correction_ancienne", v)}
           placeholder="Notation rapide"
+        /> */}
+        
+        <Correction
+          title="Ancienne correction"
+          data={data}
+          onChange={onChange}
+          fieldPrefix="ancienne"
         />
       </div>
 
@@ -115,8 +123,7 @@ export default function EssaiCompensationSection({ data, onChange }) {
       <div className="p-4 rounded-xl border bg-white space-y-4">
         <div className="font-semibold">Tests complémentaires</div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-3 border rounded-xl space-y-2">
+        <div className="p-3 border rounded-xl space-y-2">
             <div className="font-medium">Test +0.25</div>
             <div className="flex gap-4">
               <TouchCheckbox
@@ -135,7 +142,6 @@ export default function EssaiCompensationSection({ data, onChange }) {
                 onChange={() => handleTriState("test_025", "down")}
               />
             </div>
-          </div>
         </div>
 
         <div className="p-3 border rounded-xl space-y-2">
@@ -158,7 +164,40 @@ export default function EssaiCompensationSection({ data, onChange }) {
             />
           </div>
         </div>
+    
       </div>
+       {/* Texte libres */}
+        <TouchTextarea
+          label="Texte libre"
+          value={data.texte_libre || ""}
+          onChange={(v) => handleChange("texte_libre", v)} 
+          placeholder="Observations complémentaires, antécédents ou particularités visuelles..."
+          rows={4} 
+        />
+        <div className="flex gap-3 ">
+          <TouchInput
+            label="Distance de harmon : "
+            value={data.distance_de_harmon || ""}
+            onChange={(v) => handleChange("distance_de_harmon", v)} 
+            placeholder="Ex: 40 cm"
+            rows={5} 
+          />
+          <TouchInput
+            label="Revip : "
+            value={data.revip || ""}
+            onChange={(v) => handleChange("revip", v)} 
+            placeholder="Saisir la valeur..."
+            rows={5} 
+          />
+          <TouchInput
+            label="Distance de travail spécifique : "
+            value={data.distance_de_travail_sp_cifique || ""}
+            onChange={(v) => handleChange("distance_de_travail_sp_cifique", v)} 
+            placeholder="Ex: 33 cm (lecture)"
+            rows={5} 
+          />
+        </div>
+   
 
       {/* Affectation de péniche */}
       <div className="p-4 rounded-xl border bg-white space-y-4">

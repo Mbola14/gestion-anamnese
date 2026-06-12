@@ -4,6 +4,7 @@ import SectionHeader from '../SectionHeader';
 import TouchInput from '../TouchInput';
 import TouchTextarea from '../TouchTextarea';
 import TouchToggle from "../TouchToggle";
+import RecommendationContactSearch from './RecommandationContactSearch';
 
 export default function LivraisonSection({ data, onChange, opticians = [] }) {
   const handleChange = (field, value) => {
@@ -16,7 +17,7 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
 
       {/* Opticien */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Opticien</label>
+        <label className="block text-sm font-medium">Opticien validant la livraison</label>
         <select
           className="w-full rounded-xl border px-3 py-3 bg-background"
           value={data.livraison_opticien || ''}
@@ -60,7 +61,6 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
       </div>
 
       {/* Satisfaction client */}
-      {/* Satisfaction client */}
       <div
         className={[
           "p-4 rounded-xl border transition-colors",
@@ -101,6 +101,13 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
           )}
         />
       </div>
+      <RecommendationContactSearch
+          data={data}
+          onChange={(updater) => {
+              const updated = typeof updater === "function" ? updater(data) : updater;
+              onChange(updated);
+          }}
+      />
     </div>
   );
 }

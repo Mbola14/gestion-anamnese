@@ -112,6 +112,15 @@ export default function InfosGenerales({ data, onChange }) {
         placeholder="Ex : fatigue visuelle, sécheresse, picotements, gêne, inconfort…"
         rows={3}
       />
+      
+      {/* 7. Notes libres */}
+      <TouchTextarea
+        label="Notes libres"
+        value={data.notes_libres || ""}
+        onChange={(v) => handleChange("notes_libres", v)} 
+        placeholder="Ajoutez ici des précisions sur l'historique du client, ses préférences de montures ou des observations particulières sur sa vue..."
+        rows={4} 
+      />
     </div>
   );
 }

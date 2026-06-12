@@ -225,6 +225,7 @@ export default function EditerFiche() {
           orthoptie: rec.Orthoptie_exercices_r_alis_s || "",
           port_lentilles: rec.Port_de_lentilles || "",
           sentez_vos_yeux: rec.Ressenti_des_yeux || "",
+          notes_libres: rec?.Notes_libres ?? "",
 
           // activités (bools)
           zone_dominante: rec.Zone_dominante || "",
@@ -292,6 +293,31 @@ export default function EditerFiche() {
           nouvelle_og_prisme2: rec?.Prisme_2_OG ?? "",
           nouvelle_og_base2: rec?.Base_2_OG ?? "",
 
+          // 🔥 Anciennes correction
+          ancienne_od_sphere: rec?.Sph_re_OD_Ancienne ?? "",
+          ancienne_od_cylindre: rec?.Cylindre_OD_Ancienne ?? "",
+          ancienne_od_axe: rec?.Axe_OD_Ancienne ?? "",
+          ancienne_od_addition: rec?.Addition_OD_Ancienne ?? "",
+          ancienne_od_prisme1: rec?.Prisme_1_OD_Ancienne ?? "",
+          ancienne_od_base1: rec?.Base_1_OD_Ancienne ?? "",
+          ancienne_od_prisme2: rec?.Prisme_2_OD_Ancienne ?? "",
+          ancienne_od_base2: rec?.Base_2_OD_Ancienne ?? "",
+
+          ancienne_og_sphere: rec?.Sph_re_OG_Ancienne ?? "",
+          ancienne_og_cylindre: rec?.Cylindre_OG_Ancienne ?? "",
+          ancienne_og_axe: rec?.Axe_OG_Ancienne ?? "",
+          ancienne_og_addition: rec?.Addition_OG_Ancienne ?? "",
+          ancienne_og_prisme1: rec?.Prisme_1_OG_Ancienne ?? "",
+          ancienne_og_base1: rec?.Base_1_OG_Ancienne ?? "",
+          ancienne_og_prisme2: rec?.Prisme_2_OG_Ancienne ?? "",
+          ancienne_og_base2: rec?.Base_2_OG_Ancienne ?? "",
+          texte_libre: rec?.Texte_libre ?? "",
+          distance_de_harmon: rec?.Distance_de_Harmon ?? "",
+          revip: rec?.Revip ?? "",
+          distance_de_travail_sp_cifique: rec?.Distance_de_travail_sp_cifique ?? "",
+
+
+
           av_vl_od: rec.AV_VL_OD ?? "",
           av_vl_og: rec.AV_VL_OG ?? "",
           av_vl_odg: rec.AV_VL_ODG ?? "",
@@ -332,6 +358,8 @@ export default function EditerFiche() {
           ressenti_client: rec.Ressenti_client || "",
           points_vigilance: rec.Points_de_vigilance || "",
           satisfaction_client: rec.Satisfaction || "",
+          recommande_par_id: rec?.Recommand_par?.id || null,
+          contact_search_reco: rec?.Recommand_par?.name || "",
         }));
       } catch (e) {
         console.error("Erreur getRecord Anamneses :", e);
@@ -404,6 +432,7 @@ export default function EditerFiche() {
             Orthoptie_exercices_r_alis_s: formData.orthoptie || null,
             Port_de_lentilles: formData.port_lentilles || null,
             Ressenti_des_yeux: formData.sentez_vos_yeux || null,
+            Notes_libres: formData.notes_libres || null,
 
             // ⚠️ exemple multi-select (si tu l’utilises)
             Zone_unifocal_type_de_verres_port_s: zoneToMultiSelectArray(
@@ -454,7 +483,7 @@ export default function EditerFiche() {
             Date_derni_re_facture: formData.date_ancien_equipement || null,
             Nouvelle_correction_OD_OG: formData.correction_nouvelle || null,
 
-            // Correction détaillée (pour la section Correction.jsx)
+            // Correction nouvelle (pour la section Correction.jsx)
             Sph_re_OG: formData.nouvelle_og_sphere,
             Cylindre_OG: formData.nouvelle_og_cylindre,
             Axe_OG: formData.nouvelle_og_axe,
@@ -471,6 +500,28 @@ export default function EditerFiche() {
             Base_1_OD: formData.nouvelle_od_base1,
             Prisme_2_OD: formData.nouvelle_od_prisme2,
             Base_2_OD: formData.nouvelle_od_base2,
+
+            // correction ancienne 
+            Sph_re_OG_Ancienne: formData.ancienne_og_sphere,
+            Cylindre_OG_Ancienne: formData.ancienne_og_cylindre,
+            Axe_OG_Ancienne: formData.ancienne_og_axe,
+            Addition_OG_Ancienne: formData.ancienne_og_addition,
+            Prisme_1_OG_Ancienne: formData.ancienne_og_prisme1,
+            Base_1_OG_Ancienne: formData.ancienne_og_base1,
+            Prisme_2_OG_Ancienne: formData.ancienne_og_prisme2,
+            Base_2_OG_Ancienne: formData.ancienne_og_base2,
+            Sph_re_OD_Ancienne: formData.ancienne_od_sphere,
+            Cylindre_OD_Ancienne: formData.ancienne_od_cylindre,
+            Axe_OD_Ancienne: formData.ancienne_od_axe,
+            Addition_OD_Ancienne: formData.ancienne_od_addition,
+            Prisme_1_OD_Ancienne: formData.ancienne_od_prisme1,
+            Base_1_OD_Ancienne: formData.ancienne_od_base1,
+            Prisme_2_OD_Ancienne: formData.ancienne_od_prisme2,
+            Base_2_OD_Ancienne: formData.ancienne_od_base2,
+            Texte_libre: formData.texte_libre,
+            Distance_de_Harmon: formData.distance_de_harmon,
+            Revip: formData.revip,
+            Distance_de_travail_sp_cifique: formData.distance_de_travail_sp_cifique,
 
             AV_VL_OD: formData.av_vl_od ?? null,
             AV_VL_OG: formData.av_vl_og ?? null,
@@ -521,6 +572,9 @@ export default function EditerFiche() {
             Ressenti_client: formData.ressenti_client || null,
             Points_de_vigilance: formData.points_vigilance || null,
             Satisfaction: formData.satisfaction_client || null,
+            Recommand_par: formData.recommande_par_id
+              ? { id: formData.recommande_par_id }
+              : null,
           },
         ],
       };
