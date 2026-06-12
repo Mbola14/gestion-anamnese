@@ -111,7 +111,11 @@ export default function InfosGenerales({ data, onChange }) {
         placeholder="Ex : fatigue visuelle, sécheresse, picotements, gêne, inconfort…"
         rows={3}
       />
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
       {/* 7. Notes libres */}
       <TouchTextarea
         label="Notes libres"

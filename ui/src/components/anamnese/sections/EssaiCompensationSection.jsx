@@ -90,14 +90,22 @@ export default function EssaiCompensationSection({ data, onChange }) {
             )}
           </div>
         </div>
+<<<<<<< HEAD
         {/* ancienne correction */}
+=======
+
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
         {/* <TouchInput
           label="Correction ancienne OD / OG"
           value={data.correction_ancienne}
           onChange={(v) => handleChange("correction_ancienne", v)}
           placeholder="Notation rapide"
         /> */}
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
         <Correction
           title="Ancienne correction"
           data={data}
@@ -150,7 +158,11 @@ export default function EssaiCompensationSection({ data, onChange }) {
                 onChange={() => handleTriState("test_025", "down")}
               />
             </div>
+<<<<<<< HEAD
           </div>
+=======
+        </div>
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
 
         <div className="p-3 border rounded-xl space-y-2">
           <div className="font-medium">Test +0.50</div>
@@ -174,8 +186,12 @@ export default function EssaiCompensationSection({ data, onChange }) {
         </div>
     
       </div>
+<<<<<<< HEAD
       
           {/* Texte libres */}
+=======
+       {/* Texte libres */}
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
         <TouchTextarea
           label="Texte libre"
           value={data.texte_libre || ""}
@@ -199,14 +215,22 @@ export default function EssaiCompensationSection({ data, onChange }) {
             rows={5} 
           />
           <TouchInput
+<<<<<<< HEAD
             label="Distance de travail spécifique :"
+=======
+            label="Distance de travail spécifique : "
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
             value={data.distance_de_travail_sp_cifique || ""}
             onChange={(v) => handleChange("distance_de_travail_sp_cifique", v)} 
             placeholder="Ex: 33 cm (lecture)"
             rows={5} 
           />
         </div>
+<<<<<<< HEAD
 
+=======
+   
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
 
       {/* Affectation de péniche */}
       <div className="p-4 rounded-xl border bg-white space-y-4">

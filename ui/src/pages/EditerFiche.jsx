@@ -91,9 +91,470 @@ export default function EditerFiche() {
   //   }
   // }, [fiche]);
 
+<<<<<<< HEAD
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.FicheAnamnese.update(ficheId, data),
     onSuccess: () => {
+=======
+    const onPageLoad = async (data) => {
+      const id = data?.EntityId || null;
+      setRecordId(id);
+
+      // 🔽 fetch opticiens (si tu veux les dropdowns)
+      try {
+        const res = await window.ZOHO.CRM.API.getAllRecords({
+          Entity: "Opticiens",
+          sort_order: "asc",
+          per_page: 200,
+          page: 1,
+        });
+
+        if (res?.data) {
+          setOpticians(
+            res.data
+              .map((o) => ({ id: o.id, prenom: o.Pr_nom }))
+              .filter((x) => x?.id)
+          );
+        }
+      } catch (e) {
+        console.error("Erreur fetch opticiens :", e);
+      }
+    };
+
+    window.ZOHO.embeddedApp.on("PageLoad", onPageLoad);
+    window.ZOHO.embeddedApp.init();
+
+    return () => {
+      try {
+        window.ZOHO.embeddedApp.off?.("PageLoad", onPageLoad);
+      } catch { }
+    };
+  }, []);
+
+  // ✅ 2) Fetch la fiche via API Zoho (getRecord)
+  useEffect(() => {
+    const fetchRecord = async () => {
+      if (!window.ZOHO) return;
+
+      if (!recordId) {
+        setIsLoading(true);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const resp = await window.ZOHO.CRM.API.getRecord({
+          Entity: "Anamneses",
+          RecordID: recordId,
+        });
+
+        const rec = resp?.data?.[0] || null;
+        console.log("REC PORT DE LENTILLES : ", rec.Port_de_lentilles);
+
+        if (!rec) {
+          setFormData({});
+          setError("Aucune donnée.");
+          return;
+        }
+
+        // ✅ hydrate formData depuis le record Zoho
+        // NOTE: on garde les clés CRM ET on ajoute les clés "form" dont tes composants ont besoin.
+        // Pour les lookups (Contact/Opticiens/Péniche): on met l'id sur les champs *_id utilisés au save.
+
+        // Multi-select Zoho -> objet booléen pour le formulaire
+        const zoneArray = Array.isArray(rec.Zone_unifocal_type_de_verres_port_s)
+          ? rec.Zone_unifocal_type_de_verres_port_s
+          : [];
+
+        setFormData((prev) => ({
+          ...prev,
+
+          // --- champs "form" utilisés par tes sections ---
+          email: rec.Email || "",
+          nom: rec.Nom || "",
+          prenom: rec.Pr_nom || "",
+          date_naissance: rec.Date_de_naissance || "",
+          nouveau_client: typeof rec.Nouveau_client === "boolean" ? rec.Nouveau_client : false,
+          date_visite: rec.Date_de_visite || "",
+
+          contact_id: rec?.Contact?.id || null,
+          opticien_visite: rec?.Opticien_visite?.id || "",
+
+          type_equipement: rec.Type_d_quipement || "",
+          ecarts_pupillaires: rec.carts_pupillaires_OD_OG || "",
+          motif_visite_boutique: rec.Motif_de_la_visite_boutique || "",
+          autre_raison_qualissime: !!rec.Motif_Qualissime,
+          autre_raison_perte_lunettes: !!rec.Motif_Perte_de_lunettes,
+          sante_oculaire: rec.Sant_oculaire_PIO_FO || "",
+          orthoptie: rec.Orthoptie_exercices_r_alis_s || "",
+          port_lentilles: rec.Port_de_lentilles || "",
+          sentez_vos_yeux: rec.Ressenti_des_yeux || "",
+          notes_libres: rec?.Notes_libres ?? "",
+
+          // activités (bools)
+          zone_dominante: rec.Zone_dominante || "",
+          vl_conduite_auto: !!rec.Conduite_automobile,
+          vl_conduite_nuit: !!rec.Conduite_de_nuit,
+          vl_marche_exterieur: !!rec.Marche_ext_rieur,
+          vl_velo_deuxroues: !!rec.V_lo_deux_roues,
+          vl_sport_exterieur: !!rec.Sport_ext_rieur,
+          vl_voyage: !!rec.Voyage_fr_quent,
+          vl_observation_distance: !!rec.Observation_distance,
+          vl_lecture_panneaux: !!rec.Lecture_de_panneaux,
+          autres_activites_vl: rec.Autres_activit_s_VL || "",
+
+          vi_ordinateur_fixe: !!rec.Ordinateur_fixe,
+          vi_ordinateur_portable: !!rec.Ordinateur_portable,
+          vi_double_ecran: !!rec.Double_cran,
+          vi_ecran_prolonge: !!rec.cran_prolong,
+          vi_television: !!rec.T_l_vision,
+          vi_cuisine: !!rec.Cuisine,
+          vi_bricolage: !!rec.Bricolage,
+          vi_atelier: !!rec.Activit_manuelle,
+          vi_enseignement: !!rec.Enseignement_pr_sentation,
+          vi_commerce: !!rec.Commerce_accueil_client,
+          autres_activites_vi: rec.Autres_activit_s_VI || "",
+
+          vp_lecture_intensive: !!rec.Lecture_intensive,
+          vp_lecture_occasionnelle: !!rec.Lecture_occasionnelle,
+          vp_smartphone: !!rec.T_l_phone_smartphone,
+          vp_tablette: !!rec.Tablette,
+          vp_ecriture: !!rec.criture,
+          vp_etude: !!rec.tude_r_vision,
+          vp_couture_tricot: !!rec.Couture_tricot,
+          vp_dessin_peinture: !!rec.Dessin_peinture,
+          vp_precision: !!rec.Activit_s_de_pr_cision,
+          autres_activites_vp: rec.Autres_activit_s_VP || "",
+
+          // Essai de compensation
+          unifocal_zone: {
+            VL: zoneArray.includes("VL"),
+            VI: zoneArray.includes("VI"),
+            VP: zoneArray.includes("VP"),
+          },
+
+          type_verres_ancien: rec.Type_de_verres_port_s || "",
+          correction_ancienne: rec.Ancienne_correction_OD_OG || "",
+          date_ancien_equipement: rec.Date_derni_re_facture || "",
+          correction_nouvelle: rec.Nouvelle_correction_OD_OG || "",
+
+          // --- Nouvelle correction (Correction.jsx) ---
+          nouvelle_od_sphere: rec?.Sph_re_OD ?? "",
+          nouvelle_od_cylindre: rec?.Cylindre_OD ?? "",
+          nouvelle_od_axe: rec?.Axe_OD ?? "",
+          nouvelle_od_addition: rec?.Addition_OD ?? "",
+          nouvelle_od_prisme1: rec?.Prisme_1_OD ?? "",
+          nouvelle_od_base1: rec?.Base_1_OD ?? "",
+          nouvelle_od_prisme2: rec?.Prisme_2_OD ?? "",
+          nouvelle_od_base2: rec?.Base_2_OD ?? "",
+
+          nouvelle_og_sphere: rec?.Sph_re_OG ?? "",
+          nouvelle_og_cylindre: rec?.Cylindre_OG ?? "",
+          nouvelle_og_axe: rec?.Axe_OG ?? "",
+          nouvelle_og_addition: rec?.Addition_OG ?? "",
+          nouvelle_og_prisme1: rec?.Prisme_1_OG ?? "",
+          nouvelle_og_base1: rec?.Base_1_OG ?? "",
+          nouvelle_og_prisme2: rec?.Prisme_2_OG ?? "",
+          nouvelle_og_base2: rec?.Base_2_OG ?? "",
+
+          // 🔥 Anciennes correction
+          ancienne_od_sphere: rec?.Sph_re_OD_Ancienne ?? "",
+          ancienne_od_cylindre: rec?.Cylindre_OD_Ancienne ?? "",
+          ancienne_od_axe: rec?.Axe_OD_Ancienne ?? "",
+          ancienne_od_addition: rec?.Addition_OD_Ancienne ?? "",
+          ancienne_od_prisme1: rec?.Prisme_1_OD_Ancienne ?? "",
+          ancienne_od_base1: rec?.Base_1_OD_Ancienne ?? "",
+          ancienne_od_prisme2: rec?.Prisme_2_OD_Ancienne ?? "",
+          ancienne_od_base2: rec?.Base_2_OD_Ancienne ?? "",
+
+          ancienne_og_sphere: rec?.Sph_re_OG_Ancienne ?? "",
+          ancienne_og_cylindre: rec?.Cylindre_OG_Ancienne ?? "",
+          ancienne_og_axe: rec?.Axe_OG_Ancienne ?? "",
+          ancienne_og_addition: rec?.Addition_OG_Ancienne ?? "",
+          ancienne_og_prisme1: rec?.Prisme_1_OG_Ancienne ?? "",
+          ancienne_og_base1: rec?.Base_1_OG_Ancienne ?? "",
+          ancienne_og_prisme2: rec?.Prisme_2_OG_Ancienne ?? "",
+          ancienne_og_base2: rec?.Base_2_OG_Ancienne ?? "",
+          texte_libre: rec?.Texte_libre ?? "",
+          distance_de_harmon: rec?.Distance_de_Harmon ?? "",
+          revip: rec?.Revip ?? "",
+          distance_de_travail_sp_cifique: rec?.Distance_de_travail_sp_cifique ?? "",
+
+
+
+          av_vl_od: rec.AV_VL_OD ?? "",
+          av_vl_og: rec.AV_VL_OG ?? "",
+          av_vl_odg: rec.AV_VL_ODG ?? "",
+          av_vp_od: rec.AV_VP_OD ?? "",
+          av_vp_og: rec.AV_VP_OG ?? "",
+          av_vp_odg: rec.AV_VP_ODG ?? "",
+
+          // tests tri-state => on reconstruit les bools depuis les valeurs texte
+          test_025_up: rec.Test_0_25 === "Montée",
+          test_025_equal: rec.Test_0_25 === "Stable",
+          test_025_down: rec.Test_0_25 === "Chute",
+
+          test_05_up: rec.Test_0_50 === "Montée",
+          test_05_equal: rec.Test_0_50 === "Stable",
+          test_05_down: rec.Test_0_50 === "Chute",
+
+          // péniche
+          peniche_id: rec?.P_niche?.id || null,
+          peniche: rec?.P_niche?.name || "",
+
+          // contrôle
+          controle_opticien: rec?.Opticien_contr_le?.id || "",
+          controle_1er_vis: !!rec.Premier_quipement_vis,
+          controle_1er_polissage: !!rec.Premier_quipement_polissage,
+          controle_1er_transition: !!rec.Premier_quipement_transition,
+          controle_1er_opticien: rec?.Opticien_premier_quipement?.id || "",
+
+          controle_2eme_vis: !!rec.Deuxi_me_quipement_vis,
+          controle_2eme_polissage: !!rec.Deuxi_me_quipement_polissage,
+          controle_2eme_transition: !!rec.Deuxi_me_quipement_transition,
+          controle_2eme_opticien: rec?.Opticien_deuxi_me_quipement?.id || "",
+
+          securite_monture_metal: !!rec.S_curit_monture_m_tal,
+
+          // livraison
+          livraison_opticien: rec?.Opticien_livraison?.id || "",
+          acuite_odg: rec.Acuit_ODG_livraison ?? "",
+          ressenti_client: rec.Ressenti_client || "",
+          points_vigilance: rec.Points_de_vigilance || "",
+          satisfaction_client: rec.Satisfaction || "",
+          recommande_par_id: rec?.Recommand_par?.id || null,
+          contact_search_reco: rec?.Recommand_par?.name || "",
+        }));
+      } catch (e) {
+        console.error("Erreur getRecord Anamneses :", e);
+        setError("Impossible de charger la fiche.");
+        setFormData({});
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecord();
+  }, [recordId]);
+
+  const title = useMemo(() => {
+    const prenom = formData?.prenom || "";
+    const nom = formData?.nom || "";
+    const full = [prenom, nom].filter(Boolean).join(" ");
+    return full ? `Édition — ${full}` : "Édition de la fiche";
+  }, [formData?.prenom, formData?.nom]);
+
+  // ✅ UPDATE via API Zoho (PUT /Anamneses/{id})
+  const handleSave = async () => {
+    if (!recordId) return;
+    if (!window.ZOHO) return;
+
+    try {
+      setIsSaving(true);
+      setError(null);
+      const get_contact = await window.ZOHO.CRM.API.getRecord({
+        Entity: "Contacts",
+        RecordID: formData.contact_id,
+      });
+
+      const contact_record = get_contact?.data?.[0] || null;
+      console.log("PRENOM DANS LE CONTACT RECORD AVANT UPDATE : ", contact_record.First_Name);
+      let penicheIdToUse = formData.peniche_id || null;
+      // Si péniche libre → on crée une péniche
+      if (formData.libre === true) {
+        penicheIdToUse = await createZohoPeniche(formData);
+      };
+      console.log("ID PENICHE À UTILISER POUR UPDATE : ", penicheIdToUse);
+      const fullName = [contact_record.First_Name, contact_record.Last_Name].filter(Boolean).join(" ");
+
+      const payload = {
+        data: [
+          {
+            // === IDENTIFICATION ===
+            Contact: formData.contact_id ? { id: formData.contact_id } : null,
+            Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
+            Email: formData.email || null,
+            Nom: formData.nom || null,
+            Pr_nom: formData.prenom || null,
+            Date_de_naissance: formData.date_naissance || null,
+            Nouveau_client:
+              typeof formData.nouveau_client === "boolean"
+                ? formData.nouveau_client
+                : null,
+            Date_de_visite: formData.date_visite || null,
+            Opticien_visite: formData.opticien_visite
+              ? { id: formData.opticien_visite }
+              : null,
+
+            // === INFORMATIONS GÉNÉRALES ===
+            Type_d_quipement: formData.type_equipement || null,
+            carts_pupillaires_OD_OG: formData.ecarts_pupillaires || null,
+            Motif_de_la_visite_boutique: formData.motif_visite_boutique || null,
+            Motif_Qualissime: !!formData.autre_raison_qualissime,
+            Motif_Perte_de_lunettes: !!formData.autre_raison_perte_lunettes,
+            Sant_oculaire_PIO_FO: formData.sante_oculaire || null,
+            Orthoptie_exercices_r_alis_s: formData.orthoptie || null,
+            Port_de_lentilles: formData.port_lentilles || null,
+            Ressenti_des_yeux: formData.sentez_vos_yeux || null,
+            Notes_libres: formData.notes_libres || null,
+
+            // ⚠️ exemple multi-select (si tu l’utilises)
+            Zone_unifocal_type_de_verres_port_s: zoneToMultiSelectArray(
+              formData.unifocal_zone
+            ),
+
+            // === ACTIVITÉS ===
+            Zone_dominante: formData.zone_dominante,
+            // ----- VL
+            Conduite_automobile: !!formData.vl_conduite_auto,
+            Conduite_de_nuit: !!formData.vl_conduite_nuit,
+            Marche_ext_rieur: !!formData.vl_marche_exterieur,
+            V_lo_deux_roues: !!formData.vl_velo_deuxroues,
+            Sport_ext_rieur: !!formData.vl_sport_exterieur,
+            Voyage_fr_quent: !!formData.vl_voyage,
+            Observation_distance: !!formData.vl_observation_distance,
+            Lecture_de_panneaux: !!formData.vl_lecture_panneaux,
+            Autres_activit_s_VL: formData.autres_activites_vl || null,
+
+            // ----- VI
+            Ordinateur_fixe: !!formData.vi_ordinateur_fixe,
+            Ordinateur_portable: !!formData.vi_ordinateur_portable,
+            Double_cran: !!formData.vi_double_ecran,
+            cran_prolong: !!formData.vi_ecran_prolonge,
+            T_l_vision: !!formData.vi_television,
+            Cuisine: !!formData.vi_cuisine,
+            Bricolage: !!formData.vi_bricolage,
+            Activit_manuelle: !!formData.vi_atelier,
+            Enseignement_pr_sentation: !!formData.vi_enseignement,
+            Commerce_accueil_client: !!formData.vi_commerce,
+            Autres_activit_s_VI: formData.autres_activites_vi || null,
+
+            // ----- VP
+            Lecture_intensive: !!formData.vp_lecture_intensive,
+            Lecture_occasionnelle: !!formData.vp_lecture_occasionnelle,
+            T_l_phone_smartphone: !!formData.vp_smartphone,
+            Tablette: !!formData.vp_tablette,
+            criture: !!formData.vp_ecriture,
+            tude_r_vision: !!formData.vp_etude,
+            Couture_tricot: !!formData.vp_couture_tricot,
+            Dessin_peinture: !!formData.vp_dessin_peinture,
+            Activit_s_de_pr_cision: !!formData.vp_precision,
+            Autres_activit_s_VP: formData.autres_activites_vp || null,
+
+            // === ESSAI ===
+            Type_de_verres_port_s: formData.type_verres_ancien || null,
+            Ancienne_correction_OD_OG: formData.correction_ancienne || null,
+            Date_derni_re_facture: formData.date_ancien_equipement || null,
+            Nouvelle_correction_OD_OG: formData.correction_nouvelle || null,
+
+            // Correction nouvelle (pour la section Correction.jsx)
+            Sph_re_OG: formData.nouvelle_og_sphere,
+            Cylindre_OG: formData.nouvelle_og_cylindre,
+            Axe_OG: formData.nouvelle_og_axe,
+            Addition_OG: formData.nouvelle_og_addition,
+            Prisme_1_OG: formData.nouvelle_og_prisme1,
+            Base_1_OG: formData.nouvelle_og_base1,
+            Prisme_2_OG: formData.nouvelle_og_prisme2,
+            Base_2_OG: formData.nouvelle_og_base2,
+            Sph_re_OD: formData.nouvelle_od_sphere,
+            Cylindre_OD: formData.nouvelle_od_cylindre,
+            Axe_OD: formData.nouvelle_od_axe,
+            Addition_OD: formData.nouvelle_od_addition,
+            Prisme_1_OD: formData.nouvelle_od_prisme1,
+            Base_1_OD: formData.nouvelle_od_base1,
+            Prisme_2_OD: formData.nouvelle_od_prisme2,
+            Base_2_OD: formData.nouvelle_od_base2,
+
+            // correction ancienne 
+            Sph_re_OG_Ancienne: formData.ancienne_og_sphere,
+            Cylindre_OG_Ancienne: formData.ancienne_og_cylindre,
+            Axe_OG_Ancienne: formData.ancienne_og_axe,
+            Addition_OG_Ancienne: formData.ancienne_og_addition,
+            Prisme_1_OG_Ancienne: formData.ancienne_og_prisme1,
+            Base_1_OG_Ancienne: formData.ancienne_og_base1,
+            Prisme_2_OG_Ancienne: formData.ancienne_og_prisme2,
+            Base_2_OG_Ancienne: formData.ancienne_og_base2,
+            Sph_re_OD_Ancienne: formData.ancienne_od_sphere,
+            Cylindre_OD_Ancienne: formData.ancienne_od_cylindre,
+            Axe_OD_Ancienne: formData.ancienne_od_axe,
+            Addition_OD_Ancienne: formData.ancienne_od_addition,
+            Prisme_1_OD_Ancienne: formData.ancienne_od_prisme1,
+            Base_1_OD_Ancienne: formData.ancienne_od_base1,
+            Prisme_2_OD_Ancienne: formData.ancienne_od_prisme2,
+            Base_2_OD_Ancienne: formData.ancienne_od_base2,
+            Texte_libre: formData.texte_libre,
+            Distance_de_Harmon: formData.distance_de_harmon,
+            Revip: formData.revip,
+            Distance_de_travail_sp_cifique: formData.distance_de_travail_sp_cifique,
+
+            AV_VL_OD: formData.av_vl_od ?? null,
+            AV_VL_OG: formData.av_vl_og ?? null,
+            AV_VL_ODG: formData.av_vl_odg ?? null,
+            AV_VP_OD: formData.av_vp_od ?? null,
+            AV_VP_OG: formData.av_vp_og ?? null,
+            AV_VP_ODG: formData.av_vp_odg ?? null,
+
+            Test_0_25: getTriStateValue(
+              formData.test_025_up,
+              formData.test_025_equal,
+              formData.test_025_down
+            ),
+            Test_0_50: getTriStateValue(
+              formData.test_05_up,
+              formData.test_05_equal,
+              formData.test_05_down
+            ),
+
+            P_niche: penicheIdToUse ? { id: penicheIdToUse } : null,
+
+            // === CONTRÔLE ===
+            Opticien_contr_le: formData.controle_opticien
+              ? { id: formData.controle_opticien }
+              : null,
+
+            Premier_quipement_vis: !!formData.controle_1er_vis,
+            Premier_quipement_polissage: !!formData.controle_1er_polissage,
+            Premier_quipement_transition: !!formData.controle_1er_transition,
+            Opticien_premier_quipement: formData.controle_1er_opticien
+              ? { id: formData.controle_1er_opticien }
+              : null,
+
+            Deuxi_me_quipement_vis: !!formData.controle_2eme_vis,
+            Deuxi_me_quipement_polissage: !!formData.controle_2eme_polissage,
+            Deuxi_me_quipement_transition: !!formData.controle_2eme_transition,
+            Opticien_deuxi_me_quipement: formData.controle_2eme_opticien
+              ? { id: formData.controle_2eme_opticien }
+              : null,
+
+            S_curit_monture_m_tal: !!formData.securite_monture_metal,
+
+            // === LIVRAISON ===
+            Opticien_livraison: formData.livraison_opticien
+              ? { id: formData.livraison_opticien }
+              : null,
+            Acuit_ODG_livraison: formData.acuite_odg ?? null,
+            Ressenti_client: formData.ressenti_client || null,
+            Points_de_vigilance: formData.points_vigilance || null,
+            Satisfaction: formData.satisfaction_client || null,
+            Recommand_par: formData.recommande_par_id
+              ? { id: formData.recommande_par_id }
+              : null,
+          },
+        ],
+      };
+      console.log("PAYLOAD CONSTRUIT POUR L'UPDATE : ", payload);
+
+      const resp = await window.ZOHO.CRM.CONNECTION.invoke("zcrm", {
+        url: `https://www.zohoapis.eu/crm/v8/Anamneses/${recordId}`,
+        method: "PUT",
+        parameters: payload,
+      });
+
+      console.log("UPDATE ANAMNESE RESP:", resp);
+
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
       setShowSuccess(true);
       queryClient.invalidateQueries({ queryKey: ['fiches'] });
       setTimeout(() => {

@@ -4,7 +4,11 @@ import SectionHeader from '../SectionHeader';
 import TouchInput from '../TouchInput';
 import TouchTextarea from '../TouchTextarea';
 import TouchToggle from "../TouchToggle";
+<<<<<<< HEAD
 import RecommendationContactSearch from './RecommendationContactSearch';
+=======
+import RecommendationContactSearch from './RecommandationContactSearch';
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
 
 export default function LivraisonSection({ data, onChange, opticians = [] }) {
   const handleChange = (field, value) => {
@@ -60,7 +64,11 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
         />
       </div>
 
+<<<<<<< HEAD
       {/* Satisfaction client + Recommandé par */}
+=======
+      {/* Satisfaction client */}
+>>>>>>> 42cf52142c6fa1e2beef2b8dac422bb526e04c3f
       <div
         className={[
           "p-4 rounded-xl border transition-colors space-y-4",
@@ -113,6 +121,13 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
           }}
         />
       </div>
+      <RecommendationContactSearch
+          data={data}
+          onChange={(updater) => {
+              const updated = typeof updater === "function" ? updater(data) : updater;
+              onChange(updated);
+          }}
+      />
     </div>
   );
 }
