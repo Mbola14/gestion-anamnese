@@ -56,7 +56,7 @@ export default function ActivitesSection({ data, onChange }) {
             { value: "VL (Vision de loin)", label: "VL (Vision de loin)" },
             { value: "VI (Vision intermédiaire)", label: "VI (Vision intermédiaire)" },
             { value: "VP (Vision de près)", label: "VP (Vision de près)" },
-            { value: "Vision progressive", label: "Vision progressive" },
+            { value: "Aucune zone dominante", label: "Aucune zone dominante" },
           ]}
           value={data.zone_dominante || ""}
           onChange={(v) => handleChange("zone_dominante", v)}

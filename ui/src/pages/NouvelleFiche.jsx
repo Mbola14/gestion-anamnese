@@ -116,31 +116,27 @@ export default function NouvelleFiche() {
 
   const mapUnifocalZoneToArray = (zoneObj) => {
     if (!zoneObj || typeof zoneObj !== "object") return [];
-
     return Object.entries(zoneObj)
       .filter(([_, checked]) => checked === true)
       .map(([zone]) => zone);
   };
 
+  // ✅ Crée un Deal Zoho pour une péniche libre (N_Péniches)
+  const create_deal_peniche = async (contactId) => {
+    const numPeniche = formData.peniche_numero;
+    if (!numPeniche) throw new Error("Numéro de péniche manquant");
 
-  const createZohoPeniche = async (contactId) => {
-    const nomPeniche = String(formData.peniche ?? "").trim();
-    const numeroPeniche = String(formData.n_peniche ?? formData.peniche ?? "").trim();
-    console.log("ID PENICHE ------------->", formData.peniche_id);
-
-
-    if (!nomPeniche || !numeroPeniche || !contactId) {
-      throw new Error("Champs obligatoires péniche manquants");
-    }
+    const dealName = `Péniche N° ${numPeniche}`;
+    console.log("Création Deal péniche :", dealName);
 
     const payload = {
       data: [
         {
-          Deal_Name: nomPeniche,
-          Contact_Name: { id: contactId },
-          N_de_p_niche: { id: formData.peniche_id },
-          Pipeline: "Montures +verres",
+          Deal_Name: dealName,
           Stage: "En attente",
+          Pipeline: "Montures +verres",            // ✅ champ obligatoire Zoho
+          Contact_Name: contactId ? { id: contactId } : undefined,
+          N_de_p_niche: { id: formData.peniche_id }, // ✅ lie la N_Péniche au Deal
         },
       ],
     };
@@ -151,34 +147,47 @@ export default function NouvelleFiche() {
       parameters: payload,
     });
 
-    const newId = response?.details?.statusMessage?.data?.[0]?.details?.id;
-    console.log("NEW ID -----------------> ", newId);
+    console.log("Réponse création Deal péniche :", JSON.stringify(response));
+    console.log("Réponse brute : " , response);
+    
+    const respData = typeof response.details?.statusMessage === "string" 
+    ? JSON.parse(response.details.statusMessage) 
+    : (response.details?.statusMessage || response);
 
 
+    // const newId = response?.details?.statusMessage?.data?.[0]?.details?.id;
+    const newId = respData?.data?.[0]?.details?.id || respData?.action?.[0]?.details?.id;
+    // if (!newId) throw new Error("ID du Deal péniche non récupéré dans la réponse");
     if (!newId) {
-      console.error("Erreur création péniche :", response);
-      throw new Error("Impossible de récupérer l'ID de la péniche créée");
+        console.error("Structure de réponse inconnue :", respData);
+        throw new Error("ID du Deal péniche non récupéré dans la réponse");
+    }
+    // ✅ Marquer la N_Péniche comme non libre (Libre = false)
+    try {
+      await ZOHO.CRM.CONNECTION.invoke("zcrm", {
+        url: `https://www.zohoapis.eu/crm/v8/N_P_niches/${formData.peniche_id}`,
+        method: "PUT",
+        parameters: {
+          data: [{ Libre: false }],
+        },
+      });
+      console.log("N_Péniche marquée comme non libre ✅");
+    } catch (e) {
+      console.warn("Impossible de marquer la N_Péniche comme non libre :", e);
     }
 
-    return newId;
+    return String(newId);
   };
 
-
-
-  const createZohoAnamnese = async (contactId) => {
+  const createZohoAnamnese = async (contactId, penicheId = null) => {
     const fullName = [formData.prenom, formData.nom].filter(Boolean).join(" ");
-    
-    let penicheIdToUse = formData.peniche_id || null;
-    // Si péniche libre → on crée une péniche
-    if (formData.libre === true) {
-      penicheIdToUse = await createZohoPeniche(contactId);
-    }
+    console.log("PRINT SPHERE : ----------> ", formData.nouvelle_og_sphere);
 
     const json_data = {
       data: [
         {
           // === IDENTIFICATION ===
-          Contact: contactId ? { id: contactId } : null, // ✅ IMPORTANT
+          Contact: contactId ? { id: contactId } : null,
           Name: fullName ? `Anamnese - ${fullName}` : "Anamnese",
           Nouveau_client: formData.nouveau_client,
           Date_de_visite: formData.date_visite,
@@ -194,6 +203,7 @@ export default function NouvelleFiche() {
           Orthoptie_exercices_r_alis_s: formData.orthoptie,
           Port_de_lentilles: formData.port_lentilles,
           Ressenti_des_yeux: formData.sentez_vos_yeux,
+          Notes_libres: formData.notes_libres,
 
           // === ACTIVITÉS ===
           Zone_dominante: formData.zone_dominante,
@@ -237,7 +247,6 @@ export default function NouvelleFiche() {
           Date_derni_re_facture: formData.date_ancien_equipement,
           Nouvelle_correction_OD_OG: formData.correction_nouvelle,
 
-
           Sph_re_OG: formData.nouvelle_og_sphere,
           Cylindre_OG: formData.nouvelle_og_cylindre,
           Axe_OG: formData.nouvelle_og_axe,
@@ -255,6 +264,26 @@ export default function NouvelleFiche() {
           Prisme_2_OD: formData.nouvelle_od_prisme2,
           Base_2_OD: formData.nouvelle_od_base2,
 
+          Sph_re_OG_Ancienne: formData.ancienne_og_sphere,
+          Cylindre_OG_Ancienne: formData.ancienne_og_cylindre,
+          Axe_OG_Ancienne: formData.ancienne_og_axe,
+          Addition_OG_Ancienne: formData.ancienne_og_addition,
+          Prisme_1_OG_Ancienne: formData.ancienne_og_prisme1,
+          Base_1_OG_Ancienne: formData.ancienne_og_base1,
+          Prisme_2_OG_Ancienne: formData.ancienne_og_prisme2,
+          Base_2_OG_Ancienne: formData.ancienne_og_base2,
+          Sph_re_OD_Ancienne: formData.ancienne_od_sphere,
+          Cylindre_OD_Ancienne: formData.ancienne_od_cylindre,
+          Axe_OD_Ancienne: formData.ancienne_od_axe,
+          Addition_OD_Ancienne: formData.ancienne_od_addition,
+          Prisme_1_OD_Ancienne: formData.ancienne_od_prisme1,
+          Base_1_OD_Ancienne: formData.ancienne_od_base1,
+          Prisme_2_OD_Ancienne: formData.ancienne_od_prisme2,
+          Base_2_OD_Ancienne: formData.ancienne_od_base2,
+          Texte_libre: formData.texte_libre,
+          Distance_de_Harmon: formData.distance_de_harmon,
+          Revip: formData.revip,
+          Distance_de_travail_sp_cifique: formData.distance_de_travail_sp_cifique,
 
           AV_VL_OD: formData.av_vl_od,
           AV_VL_OG: formData.av_vl_og,
@@ -264,7 +293,10 @@ export default function NouvelleFiche() {
           AV_VP_ODG: formData.av_vp_odg,
           Test_0_25: getTriStateValue(formData.test_025_up, formData.test_025_equal, formData.test_025_down),
           Test_0_50: getTriStateValue(formData.test_05_up, formData.test_05_equal, formData.test_05_down),
-          P_niche: penicheIdToUse ? { id: penicheIdToUse } : null,
+
+          // ✅ ID du Deal (existant ou nouvellement créé)
+          P_niche: penicheId ? { id: String(penicheId) } : null,
+
           // === CONTRÔLE ===
           Opticien_contr_le: formData.controle_opticien ? { id: formData.controle_opticien } : null,
           Premier_quipement_vis: formData.controle_1er_vis,
@@ -283,27 +315,17 @@ export default function NouvelleFiche() {
           Ressenti_client: formData.ressenti_client,
           Points_de_vigilance: formData.points_vigilance,
           Satisfaction: formData.satisfaction_client,
+          Qualissime: formData.Qualissisme,
+          Date_activation_qualissime: formData.Date_Qualissime,
+          Recommand_par: formData.recommande_par_id
+            ? { id: formData.recommande_par_id }
+            : null,
         },
       ],
     };
 
-    console.log("json data : ", json_data);
-    
-    const func_name = "send_mail_json_fa";
-    const req_data = {
-      arguments: JSON.stringify({ json : JSON.stringify(json_data) }),
-    };
-    console.log("REQ DATA : ", req_data);
-
-    ZOHO.CRM.FUNCTIONS.execute(func_name, req_data)
-      .then((resp) => {
-        console.log("RESPONSE ENVOI MAIL : ", resp);
-      })
-      .catch((e) => {
-        console.error("Erreur send_mail_json_fa :", e);
-      });
-
     console.log("ID CONTACT A ASSOCIER (UTILISÉ) :", contactId);
+    console.log("=== JSON ENVOYÉ À ZOHO ===", JSON.stringify(json_data, null, 2));
 
     return ZOHO.CRM.CONNECTION.invoke("zcrm", {
       url: "https://www.zohoapis.eu/crm/v8/Anamneses",
@@ -322,19 +344,51 @@ export default function NouvelleFiche() {
 
   const handleSave = async () => {
     try {
-      console.log("peniche data au save :", penicheData);
+      console.log("=== FORM DATA AU SAVE ===", {
+        peniche_id: formData.peniche_id,
+        peniche: formData.peniche,
+        peniche_libre: formData.peniche_libre,
+        peniche_numero: formData.peniche_numero,
+        contact_id: formData.contact_id,
+        nom: formData.nom,
+        email: formData.email,
+      });
 
-      // 1️⃣ créer ou récupérer le contact
-      const contactId = await create_contact();
-      if (!contactId) {
-        console.error("Impossible de créer/trouver le contact.");
-        return;
+      // 1️⃣ Créer ou récupérer le contact (non bloquant)
+      let contactId = null;
+      try {
+        contactId = await create_contact();
+      } catch (e) {
+        console.warn("Contact non créé, on continue sans :", e);
+      }
+      console.log("=== CONTACT ID ===", contactId);
+
+      // 2️⃣ Gérer la péniche
+      let finalPenicheId = null;
+
+      if (formData.peniche_id) {
+        if (formData.peniche_libre === true) {
+          // ✅ Péniche libre → créer un Deal + marquer Libre:false
+          console.log("Péniche libre détectée → création d'un Deal Zoho...");
+          try {
+            finalPenicheId = await create_deal_peniche(contactId);
+            console.log("Deal péniche créé avec ID :", finalPenicheId);
+          } catch (e) {
+            console.error("Erreur création Deal péniche, on continue sans :", e);
+            finalPenicheId = null;
+          }
+        } else {
+          // ✅ Deal existant → utiliser directement son ID
+          finalPenicheId = String(formData.peniche_id);
+          console.log("Deal péniche existant, ID utilisé :", finalPenicheId);
+        }
       }
 
-      // 2️⃣ créer l’anamnèse AVEC l’id du contact
-      await createZohoAnamnese(contactId);
+      // 3️⃣ Créer l'anamnèse avec le bon ID de péniche
+      const result = await createZohoAnamnese(contactId, finalPenicheId);
+      console.log("=== RESULT ZOHO ===", JSON.stringify(result));
 
-      // 3️⃣ fermer le popup + recharger la fiche parente
+      // 4️⃣ Fermer le popup
       await ZOHO.CRM.UI.Popup.closeReload();
 
     } catch (e) {
@@ -342,20 +396,15 @@ export default function NouvelleFiche() {
     }
   };
 
-
-
   const create_contact = async () => {
-    // Si déjà sélectionné via ContactSearch -> rien à faire
     if (formData.contact_id) return formData.contact_id;
 
-    // Si pas de données minimales -> on ne crée pas
     const nom = (formData.nom || "").trim();
     const prenom = (formData.prenom || "").trim();
     const email = (formData.email || "").trim();
 
     if (!nom || !email) return null;
 
-    // 1) Chercher un contact existant par email (le plus fiable)
     try {
       const search = await ZOHO.CRM.API.searchRecord({
         Entity: "Contacts",
@@ -368,7 +417,6 @@ export default function NouvelleFiche() {
       const existing = search?.data?.[0];
       if (existing?.id) {
         console.log("Contact existant donc création annulé.");
-
         setFormData((prev) => ({ ...prev, contact_id: existing.id }));
         return existing.id;
       }
@@ -376,29 +424,20 @@ export default function NouvelleFiche() {
       // on ignore et on tente la création
     }
 
-    // 2) Créer le contact
-    const payload = {
-      data: [
-        {
+    try {
+      const resp = await ZOHO.CRM.API.insertRecord({
+        Entity: "Contacts",
+        APIData: {
           Last_Name: nom,
           First_Name: prenom || undefined,
           Email: email,
           Date_of_Birth: formData.date_naissance || undefined,
         },
-      ],
-    };
-
-    try {
-      const resp = await ZOHO.CRM.API.insertRecord({
-        Entity: "Contacts",
-        APIData: payload.data[0],
         Trigger: ["workflow"],
       });
       console.log("CREATE CONTACT : ", resp);
 
-
       const newId = resp?.data?.[0]?.details?.id;
-
       if (newId) {
         setFormData((prev) => ({ ...prev, contact_id: newId }));
         return newId;
@@ -409,8 +448,6 @@ export default function NouvelleFiche() {
 
     return null;
   };
-
-
 
   const renderSection = () => {
     const props = { data: formData, onChange: setFormData };
@@ -434,10 +471,7 @@ export default function NouvelleFiche() {
   };
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const goToNextTab = () => {
@@ -455,7 +489,6 @@ export default function NouvelleFiche() {
       scrollToTop();
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50">

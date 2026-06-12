@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import TouchInput from "../TouchInput";
 
-export default function ContactSearch({ data, onChange }) {
+export default function RecommendationContactSearch({ data, onChange }) {
     const setField = (field, value) => onChange((prev) => ({ ...prev, [field]: value }));
 
     const [results, setResults] = useState([]);
@@ -10,17 +10,14 @@ export default function ContactSearch({ data, onChange }) {
     const debounceRef = useRef(null);
     const lastQueryRef = useRef("");
 
-    // ✅ Si un contact est déjà sélectionné
-    const isSelected = !!data.contact_id;
+    // ✅ Si un contact est déjà sélectionné, on affiche le résumé
+    const isSelected = !!data.recommande_par_id;
 
     const handleClear = () => {
         onChange((prev) => ({
             ...prev,
-            contact_id: null,
-            contact_search: "",
-            nom: "",
-            prenom: "",
-            email: "",
+            recommande_par_id: null,
+            contact_search_reco: "",
         }));
         lastQueryRef.current = "";
         setResults([]);
@@ -29,7 +26,7 @@ export default function ContactSearch({ data, onChange }) {
     useEffect(() => {
         if (isSelected) return; // ✅ bloque la recherche si déjà sélectionné
 
-        const q = (data.contact_search || "").trim();
+        const q = (data.contact_search_reco || "").trim();
 
         setResults([]);
         setIsSearching(false);
@@ -51,12 +48,9 @@ export default function ContactSearch({ data, onChange }) {
             const req_data = {
                 arguments: JSON.stringify({ search_term: q }),
             };
-            console.log("REQ DATA : ", req_data);
 
             ZOHO.CRM.FUNCTIONS.execute(func_name, req_data)
                 .then((resp) => {
-                    console.log("RESPONSE SEARCH CONTACT : ", resp);
-
                     const output = resp?.details?.output;
                     if (!output) { setResults([]); return; }
 
@@ -64,8 +58,6 @@ export default function ContactSearch({ data, onChange }) {
                     try {
                         parsed = typeof output === "string" ? JSON.parse(output) : output;
                     } catch (e) {
-                        console.error("Erreur parsing output :", output);
-                        console.error("Erreur parsing contacts :", e);
                         setResults([]);
                         return;
                     }
@@ -76,39 +68,31 @@ export default function ContactSearch({ data, onChange }) {
                         .map((c) => ({
                             id: c.id,
                             label: c.Full_Name || `${c.First_Name || ""} ${c.Last_Name || ""}`.trim() || "Contact",
-                            firstName: c.First_Name || "",
-                            lastName: c.Last_Name || "",
                             email: c.Email || "",
                         }));
 
                     setResults(mapped);
                 })
-                .catch((e) => {
-                    console.error("Erreur search_contact :", e);
-                    setResults([]);
-                })
-                .finally(() => {
-                    setIsSearching(false);
-                });
+                .catch(() => setResults([]))
+                .finally(() => setIsSearching(false));
         }, 350);
 
         return () => {
             if (debounceRef.current) clearTimeout(debounceRef.current);
         };
-    }, [data.contact_search, isSelected]);
+    }, [data.contact_search_reco, isSelected]);
 
     return (
         <div className="p-4 rounded-xl border bg-white space-y-3">
-            <div className="font-semibold">Recherche client</div>
+            <div className="font-semibold">Recommandé par</div>
 
-            {/* ✅ Si contact sélectionné → afficher le résumé */}
+            {/* ✅ Si contact sélectionné → afficher le résumé comme la péniche */}
             {isSelected ? (
                 <div className="rounded-xl border px-4 py-3 bg-muted/20 space-y-1">
                     <div className="flex items-center justify-between">
                         <div>
-                            <div className="text-xs text-muted-foreground mb-0.5">Client sélectionné</div>
-                            <div className="font-semibold text-sm">{data.contact_search}</div>
-                            <div className="text-xs text-muted-foreground">{data.email || "—"}</div>
+                            <div className="text-xs text-muted-foreground mb-0.5">Contact sélectionné</div>
+                            <div className="font-semibold text-sm">{data.contact_search_reco}</div>
                         </div>
                         <button
                             type="button"
@@ -124,8 +108,8 @@ export default function ContactSearch({ data, onChange }) {
                 <>
                     <TouchInput
                         label="Nom / Prénom"
-                        value={data.contact_search || ""}
-                        onChange={(v) => setField("contact_search", v)}
+                        value={data.contact_search_reco || ""}
+                        onChange={(v) => setField("contact_search_reco", v)}
                         placeholder="Tapez au moins 2 caractères…"
                     />
 
@@ -141,26 +125,20 @@ export default function ContactSearch({ data, onChange }) {
                                     onClick={() => {
                                         onChange((prev) => ({
                                             ...prev,
-                                            contact_id: r.id,
-                                            contact_search: r.label,
-                                            nom: r.lastName || prev.nom,
-                                            prenom: r.firstName || prev.prenom,
-                                            email: r.email || prev.email,
+                                            recommande_par_id: r.id,
+                                            contact_search_reco: r.label,
                                         }));
                                         setResults([]);
                                     }}
                                 >
                                     <div className="font-medium">{r.label}</div>
-                                    <div className="text-xs text-muted-foreground">
-                                        {r.email || "—"}
-                                        {r.dob ? ` • Naissance : ${r.dob}` : ""}
-                                    </div>
+                                    <div className="text-xs text-muted-foreground">{r.email || "—"}</div>
                                 </button>
                             ))}
                         </div>
                     )}
 
-                    {!isSearching && (data.contact_search || "").trim().length >= 2 && results.length === 0 && (
+                    {!isSearching && (data.contact_search_reco || "").trim().length >= 2 && results.length === 0 && (
                         <div className="text-xs text-muted-foreground">Aucun résultat.</div>
                     )}
                 </>

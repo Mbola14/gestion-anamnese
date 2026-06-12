@@ -21,7 +21,7 @@ export default function InfosGenerales({ data, onChange }) {
             { value: "1ère lunette", label: "1ère lunette" },
             { value: "1er progressif", label: "1er progressif" },
             { value: "Renouvellement", label: "Renouvellement" },
-            { value: "Freination Myopie", label: "Freination Myopie" },
+            { value: "Freination Myopie", label: "Freination Myopie"}, //ligne ajouté
           ]}
           value={data.type_equipement || ""}
           onChange={(v) => handleChange("type_equipement", v)}
@@ -95,15 +95,14 @@ export default function InfosGenerales({ data, onChange }) {
         <div className="font-medium mb-3">Port de lentilles</div>
         <TouchToggle
           options={[
-            { value: "Non", label: "Non" },
-            { value: "Occasionnel", label: "Occasionnel" },
-            { value: "Régulier", label: "Régulier" },
+            { value: "non", label: "Non" },
+            { value: "occasionnel", label: "Occasionnel" },
+            { value: "regulier", label: "Régulier" },
           ]}
           value={data.port_lentilles || ""}
           onChange={(v) => handleChange("port_lentilles", v)}
         />
       </div>
-
       {/* 6. Sentez-vous vos yeux ? */}
       <TouchTextarea
         label="Sentez-vous vos yeux ?"
@@ -111,6 +110,15 @@ export default function InfosGenerales({ data, onChange }) {
         onChange={(v) => handleChange("sentez_vos_yeux", v)}
         placeholder="Ex : fatigue visuelle, sécheresse, picotements, gêne, inconfort…"
         rows={3}
+      />
+
+      {/* 7. Notes libres */}
+      <TouchTextarea
+        label="Notes libres"
+        value={data.notes_libres || ""}
+        onChange={(v) => handleChange("notes_libres", v)} 
+        placeholder="Ajoutez ici des précisions sur l'historique du client, ses préférences de montures ou des observations particulières sur sa vue..."
+        rows={4} 
       />
     </div>
   );

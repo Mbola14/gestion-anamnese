@@ -70,7 +70,7 @@ export default function IdentificationSection({ data, onChange, opticians = [] }
               required
             />
             <TouchInput
-              label="Email *"
+              label="Email"
               value={data.email || ""}
               onChange={(v) => setField("email", v)}
               placeholder="email@exemple.com"
@@ -81,7 +81,7 @@ export default function IdentificationSection({ data, onChange, opticians = [] }
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TouchInput
-              label="Date de naissance *"
+              label="Date de naissance"
               value={data.date_naissance || ""}
               onChange={(v) => setField("date_naissance", v)}
               type="date"

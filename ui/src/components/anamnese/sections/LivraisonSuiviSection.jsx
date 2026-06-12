@@ -4,6 +4,7 @@ import SectionHeader from '../SectionHeader';
 import TouchInput from '../TouchInput';
 import TouchTextarea from '../TouchTextarea';
 import TouchToggle from "../TouchToggle";
+import RecommendationContactSearch from './RecommendationContactSearch';
 
 export default function LivraisonSection({ data, onChange, opticians = [] }) {
   const handleChange = (field, value) => {
@@ -16,7 +17,7 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
 
       {/* Opticien */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Opticien</label>
+        <label className="block text-sm font-medium">Opticien validant la livraison</label>
         <select
           className="w-full rounded-xl border px-3 py-3 bg-background"
           value={data.livraison_opticien || ''}
@@ -59,11 +60,10 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
         />
       </div>
 
-      {/* Satisfaction client */}
-      {/* Satisfaction client */}
+      {/* Satisfaction client + Recommandé par */}
       <div
         className={[
-          "p-4 rounded-xl border transition-colors",
+          "p-4 rounded-xl border transition-colors space-y-4",
           data.satisfaction_client === "Satisfait"
             ? "border-green-500 bg-green-50"
             : data.satisfaction_client === "Insatisfait"
@@ -71,7 +71,7 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
               : "border-gray-200 bg-muted/30",
         ].join(" ")}
       >
-        <div className="font-medium mb-3">Satisfaction client</div>
+        <div className="font-medium">Satisfaction client</div>
 
         <TouchToggle
           options={[
@@ -99,6 +99,18 @@ export default function LivraisonSection({ data, onChange, opticians = [] }) {
               {option.label}
             </div>
           )}
+        />
+
+        {/* ✅ Séparateur */}
+        <div className="border-t border-gray-200" />
+
+        {/* ✅ Recommandé par — intégré dans le bloc satisfaction */}
+        <RecommendationContactSearch
+          data={data}
+          onChange={(updater) => {
+            const updated = typeof updater === "function" ? updater(data) : updater;
+            onChange(updated);
+          }}
         />
       </div>
     </div>
