@@ -134,7 +134,7 @@ export default function NouvelleFiche() {
         {
           Deal_Name: dealName,
           Stage: "En attente",
-          Pipeline: "Montures +verres",            // ✅ champ obligatoire Zoho
+          Pipeline: "Montures+verres",            // ✅ champ obligatoire Zoho
           Contact_Name: contactId ? { id: contactId } : undefined,
           N_de_p_niche: { id: formData.peniche_id }, // ✅ lie la N_Péniche au Deal
         },
@@ -148,7 +148,6 @@ export default function NouvelleFiche() {
     });
 
     console.log("Réponse création Deal péniche :", JSON.stringify(response));
-    console.log("Réponse brute : " , response);
     
     const respData = typeof response.details?.statusMessage === "string" 
     ? JSON.parse(response.details.statusMessage) 
@@ -362,6 +361,7 @@ export default function NouvelleFiche() {
         console.warn("Contact non créé, on continue sans :", e);
       }
       console.log("=== CONTACT ID ===", contactId);
+      console.log("=== PENICHE ID ===", formData.peniche_id);
 
       // 2️⃣ Gérer la péniche
       let finalPenicheId = null;
